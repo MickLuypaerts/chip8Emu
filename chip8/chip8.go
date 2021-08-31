@@ -1,7 +1,6 @@
 package chip8
 
 import (
-	"fmt"
 	"io/ioutil"
 )
 
@@ -22,6 +21,7 @@ type Chip8 struct {
 	sp        uint16
 	memory    [memorySize]byte
 	v         [vRegSize]byte // general purpose registers
+	vChanged  [vRegSize]bool
 	screenBuf [screenWidth * screenHeigth]byte
 	key       [keyNumbers]byte
 }
@@ -60,8 +60,4 @@ func (c *Chip8) Init(file string) error {
 		c.memory[i+512] = romData[i]
 	}
 	return nil
-}
-
-func (c Chip8) PrintMem() {
-	fmt.Printf("%02X", c.memory)
 }
