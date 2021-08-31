@@ -6,12 +6,24 @@ import (
 )
 
 const (
-	memorySize = 4096
+	memorySize   = 4096
+	vRegSize     = 16
+	stackSize    = 16
+	screenWidth  = 64
+	screenHeigth = 32
+	keyNumbers   = 16
 )
 
 type Chip8 struct {
-	opcode uint16
-	memory [memorySize]byte
+	opcode    uint16
+	i         uint16 // The address register, which is named I, is 12 bits wide and is used with several opcodes that involve memory operations.
+	pc        uint16
+	stack     [stackSize]uint16
+	sp        uint16
+	memory    [memorySize]byte
+	v         [vRegSize]byte // general purpose registers
+	screenBuf [screenWidth * screenHeigth]byte
+	key       [keyNumbers]byte
 }
 
 func (c *Chip8) Init(file string) error {
