@@ -1,0 +1,1 @@
+A Chip8 emulator in GO
