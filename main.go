@@ -1,6 +1,7 @@
 package main
 
 import (
+	"chip8/chip8"
 	"fmt"
 	"os"
 )
@@ -10,6 +11,7 @@ func main() {
 		usage()
 		return
 	}
+	var chip8 chip8.Chip8
 }
 
 func usage() {
