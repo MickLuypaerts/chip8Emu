@@ -3,6 +3,7 @@ package main
 import (
 	"chip8/chip8"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -12,6 +13,11 @@ func main() {
 		return
 	}
 	var chip8 chip8.Chip8
+	err := chip8.Init(os.Args[1])
+	if err != nil {
+		log.Fatalf("failed to initialize chip8: %v", err)
+	}
+	chip8.PrintMem()
 }
 
 func usage() {
