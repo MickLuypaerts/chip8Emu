@@ -21,6 +21,5 @@ func main() {
 }
 
 func usage() {
-	fmt.Printf("Usage: %s [OPTION] [PATTERN] [FILE]\n", os.Args[0])
-	fmt.Printf("Use %s -help for a list of flags.\n", os.Args[0])
+	fmt.Printf("Usage: %s [FILE]\n", os.Args[0])
 }
