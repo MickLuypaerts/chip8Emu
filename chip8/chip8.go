@@ -118,3 +118,11 @@ func (c *Chip8) subtract(target, x, y uint16) {
 	c.v[target] = c.v[x] - c.v[y]
 	c.vChanged[target] = true
 }
+
+func (c Chip8) getXFromOpcode() uint16 {
+	return (c.opcode & 0x0F00) >> 8
+}
+
+func (c Chip8) getYFromOpcode() uint16 {
+	return (c.opcode & 0x00F0) >> 4
+}
