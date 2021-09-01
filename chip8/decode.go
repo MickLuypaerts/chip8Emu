@@ -11,6 +11,8 @@ func (c *Chip8) decode0x000() {
 		c.clearScreen()
 		c.pc += 2
 	case 0x00EE: // 00EE
+		c.pc = c.stack[c.sp]
+		c.sp--
 	default:
 		c.pc += 2 // 0nnn
 	}
