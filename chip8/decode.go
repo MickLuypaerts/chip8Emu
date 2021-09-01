@@ -12,23 +12,23 @@ func (c *Chip8) decode() {
 		c.decode0x0000()
 	case 0x1000:
 		c.setOpcodeInfo("1NNN", "Flow", "Jumps to address NNN.")
-		c.pc = c.opcode & 0x0FFF
+		c.pc = c.getNNNFromOpcode()
 	case 0x2000:
 		c.setOpcodeInfo("2NNN", "Flow", "Calls subroutine at NNN.")
 
 		c.stack[c.sp] = c.pc
 		c.sp++
-		c.pc = c.opcode & 0x0FFF
+		c.pc = c.getNNNFromOpcode()
 	case 0x3000:
 		c.setOpcodeInfo("3XNN", "Cond", "Skips the next instruction if VX equals NN. (Usually the next instruction is a jump to skip a code block);")
 		// index := c.opcode & 0x0F00 >> 8
-		if c.v[c.getXFromOpcode()] == byte(c.opcode&0x00FF) {
+		if c.v[c.getXFromOpcode()] == byte(c.getNNFromOpcode()) {
 			c.pc += 2
 		}
 
 	case 0x4000:
 		c.setOpcodeInfo("4XNN", "Cond", "Skips the next instruction if VX does not equal NN. (Usually the next instruction is a jump to skip a code block);")
-		if c.v[c.getXFromOpcode()] != byte(c.opcode&0x00FF) {
+		if c.v[c.getXFromOpcode()] != byte(c.getNNFromOpcode()) {
 			c.pc += 2
 		}
 	case 0x5000:
@@ -40,13 +40,13 @@ func (c *Chip8) decode() {
 	case 0x6000: // 6xkk
 		c.setOpcodeInfo("6XNN", "Const", "Sets VX to NN.")
 		index := c.getXFromOpcode()
-		c.v[index] = byte(c.opcode & 0x00FF)
+		c.v[index] = byte(c.getNNFromOpcode())
 		c.vChanged[index] = true
 	case 0x7000:
 		c.setOpcodeInfo("7XNN", "Const", "Adds NN to VX. (Carry flag is not changed);")
 		// index := (c.opcode & 0x0F00) >> 8
 		index := c.getXFromOpcode()
-		c.v[index] += byte(c.opcode & 0x00FF)
+		c.v[index] += byte(c.getNNFromOpcode())
 		c.vChanged[index] = true
 		// 7xkk
 	case 0x8000:
@@ -58,7 +58,7 @@ func (c *Chip8) decode() {
 		}
 	case 0xA000:
 		c.setOpcodeInfo("ANNN", "MEM", "Sets I to the address NNN.")
-		c.i = c.opcode & 0x0FFF
+		c.i = c.getNNNFromOpcode()
 	case 0xB000:
 		// Bnnn
 		c.pc -= 2
@@ -69,7 +69,7 @@ func (c *Chip8) decode() {
 		c.setOpcodeInfo("DXYN", "Disp", "Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.")
 		x := uint16(c.v[c.getXFromOpcode()])
 		y := uint16(c.v[c.getYFromOpcode()])
-		h := uint16(c.opcode & 0x000F)
+		h := uint16(c.getNFromOpcode())
 		c.draw(x, y, h)
 		// Dxyn
 	case 0xE000:
@@ -118,22 +118,22 @@ func (c *Chip8) decode0x8000() {
 	case 0x0000:
 		c.setOpcodeInfo("8XY0", "Assig", "Sets VX to the value of VY.")
 		index := c.getXFromOpcode()
-		c.v[index] = c.v[c.opcode&0x00F0>>4]
+		c.v[index] = c.v[c.getYFromOpcode()]
 		c.vChanged[index] = true
 	case 0x0001:
 		c.setOpcodeInfo("8XY1", "BitOp", "Sets VX to VX or VY. (Bitwise OR operation);")
 		index := c.getXFromOpcode()
-		c.v[index] |= c.v[c.opcode&0x00F0>>4]
+		c.v[index] |= c.v[c.getYFromOpcode()]
 		c.vChanged[index] = true
 	case 0x0002:
 		c.setOpcodeInfo("8XY2", "BitOp", "Sets VX to VX and VY. (Bitwise AND operation);")
 		index := c.getXFromOpcode()
-		c.v[index] &= c.v[c.opcode&0x00F0>>4]
+		c.v[index] &= c.v[c.getYFromOpcode()]
 		c.vChanged[index] = true
 	case 0x0003:
 		c.setOpcodeInfo("8XY3", "BitOp", "Sets VX to VX xor VY. (Bitwise XOR operation);")
 		index := c.getXFromOpcode()
-		c.v[index] ^= c.v[c.opcode&0x00F0>>4]
+		c.v[index] ^= c.v[c.getYFromOpcode()]
 		c.vChanged[index] = true
 	case 0x0004:
 		c.setOpcodeInfo("8XY4", "Math", "Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there is not.")

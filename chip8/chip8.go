@@ -126,3 +126,15 @@ func (c Chip8) getXFromOpcode() uint16 {
 func (c Chip8) getYFromOpcode() uint16 {
 	return (c.opcode & 0x00F0) >> 4
 }
+
+func (c Chip8) getNNNFromOpcode() uint16 {
+	return c.opcode & 0x0FFF
+}
+
+func (c Chip8) getNNFromOpcode() uint16 {
+	return c.opcode & 0x00FF
+}
+
+func (c Chip8) getNFromOpcode() uint16 {
+	return c.opcode & 0x000F
+}
