@@ -36,6 +36,13 @@ func main() {
 	lGPR.WrapText = false
 	lGPR.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 
+	lKeys := widgets.NewList()
+	lKeys.Title = "Keys"
+	lKeys.Rows = chip8.GetKeyValues()
+	lKeys.TextStyle = ui.NewStyle(ui.ColorYellow)
+	lKeys.WrapText = false
+	lKeys.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
+
 	lStack := widgets.NewList()
 	lStack.Title = "Stack"
 	lStack.Rows = chip8.GetStackValues()
@@ -67,7 +74,8 @@ func main() {
 		ui.NewRow(1.0/3,
 			ui.NewCol(0.5/4, lGPR),
 			ui.NewCol(0.5/4, lStack),
-			ui.NewCol(3.0/4, lMem),
+			ui.NewCol(0.5/4, lKeys),
+			ui.NewCol(2.5/4, lMem),
 		),
 	)
 	ui.Render(grid)
@@ -115,15 +123,6 @@ func main() {
 		}
 		ui.Render(grid)
 	}
-
-	/*
-		for {
-			var wait string
-
-			fmt.Scanln(&wait)
-			chip8.EmulateCycle()
-
-		}*/
 }
 
 func usage() {

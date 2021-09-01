@@ -5,3 +5,6 @@ rIBM:
 
 rTest:
 	chip8 ".\roms\test_opcode.ch8"
+
+rTetris:
+	chip8 ".\roms\Tetris [Fran Dachille, 1991].ch8"
