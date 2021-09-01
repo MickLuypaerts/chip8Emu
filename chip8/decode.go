@@ -3,6 +3,8 @@ package chip8
 import (
 	"fmt"
 	"log"
+	"math/rand"
+	"time"
 )
 
 func (c *Chip8) decode() {
@@ -57,7 +59,10 @@ func (c *Chip8) decode() {
 		c.setOpcodeInfo("BNNN", "Flow", "Jumps to the address NNN plus V0.")
 		c.pc = c.getNNNFromOpcode() + uint16(c.v[0x0])
 	case 0xC000:
-		// Cxkk
+		c.setOpcodeInfo("CXNN", "Rand", "Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.")
+		randSource := rand.NewSource(time.Now().UnixNano())
+		r := rand.New(randSource)
+		c.v[c.getXFromOpcode()] = byte(uint16(r.Intn(256)) & c.getNNFromOpcode())
 		c.pc -= 2
 	case 0xD000:
 		c.setOpcodeInfo("DXYN", "Disp", "Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.")

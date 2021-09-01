@@ -39,7 +39,7 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] 9XY0  
 [X] ANNN  
 [X] BNNN  
-[ ] CXNN  
+[X] CXNN  
 [X] DXYN  
 [ ] EX9E  
 [ ] EXA1  
