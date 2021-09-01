@@ -125,18 +125,49 @@ func (c *Chip8) decode0x8000() {
 		c.vChanged[0xF] = true
 		c.v[indexX] += c.v[indexY]
 		c.vChanged[indexX] = true
-	case 0x0005:
-		// 8xy5
-		c.pc -= 2
+	case 0x0005: // TODO: double check 8XY5
+		c.setOpcodeInfo("8XY5", "Math", "VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there is not.")
+		indexX := c.opcode & 0x0F00 >> 8
+		indexY := c.opcode & 0x00F0 >> 4
+		c.subtract(indexX, indexX, indexY)
+		/*
+			if c.v[indexX] > c.v[indexY] {
+				c.v[0xF] = 1
+			} else {
+				c.v[0xF] = 0
+			}
+			c.vChanged[0xF] = true
+			c.v[indexX] -= c.v[indexY]
+			c.vChanged[indexX] = true
+		*/
 	case 0x0006:
-		// 8xy6
-		c.pc -= 2
+		c.setOpcodeInfo("8XY6", "BitOp", "Stores the least significant bit of VX in VF and then shifts VX to the right by 1.")
+		index := c.opcode & 0x0F00 >> 8
+		if c.v[index]&0x01 == 1 {
+			c.v[0xF] = 1
+		} else {
+			c.v[0xF] = 0
+		}
+		c.vChanged[0xF] = true
+		c.v[index] <<= 1
+		c.vChanged[index] = true
 	case 0x0007:
 		// 8xy7
-		c.pc -= 2
+		c.setOpcodeInfo("8XY7", "Math", "Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there is not.")
+		indexX := c.opcode & 0x0F00 >> 8
+		indexY := c.opcode & 0x00F0 >> 4
+		c.subtract(indexX, indexY, indexX)
 	case 0x000E:
-		// 8xyE
-		c.pc -= 2
+		c.setOpcodeInfo("8XYE", "BitOp", "Stores the most significant bit of VX in VF and then shifts VX to the left by 1.")
+		index := c.opcode & 0x0F00 >> 8
+		if c.v[index]&0x8 == 1 {
+			c.v[0xF] = 1
+		} else {
+			c.v[0xF] = 0
+		}
+		c.vChanged[0xF] = true
+		c.v[index] >>= 1
+		c.vChanged[index] = true
 	default:
 		log.Printf("[ERROR]: Unknown opcode: ox%X\n", c.opcode)
 

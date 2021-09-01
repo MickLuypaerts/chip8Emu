@@ -107,3 +107,14 @@ func (c *Chip8) EmulateCycle() {
 	c.decode()
 	c.updateTimers()
 }
+
+func (c *Chip8) subtract(target, x, y uint16) {
+	if c.v[x] > c.v[y] {
+		c.v[0xF] = 1
+	} else {
+		c.v[0xF] = 0
+	}
+	c.vChanged[0xF] = true
+	c.v[target] = c.v[x] - c.v[y]
+	c.vChanged[target] = true
+}

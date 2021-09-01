@@ -32,10 +32,10 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] 8XY2  
 [X] 8XY3  
 [X] 8XY4  
-[ ] 8XY5  
-[ ] 8XY6  
-[ ] 8XY7  
-[ ] 8XYE  
+[X] 8XY5  
+[X] 8XY6  
+[X] 8XY7  
+[X] 8XYE  
 [X] 9XY0  
 [X] ANNN  
 [ ] BNNN  
