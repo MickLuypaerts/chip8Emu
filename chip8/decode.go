@@ -71,15 +71,30 @@ func (c *Chip8) decode() {
 		c.draw(x, y, h)
 		// Dxyn
 	case 0xE000:
-		c.pc -= 2
-		// Ex9E
-		// ExA1
+		c.decode0xE000()
+
 	case 0xF000:
 		c.decode0xF000()
 	default:
 		log.Printf("[ERROR]: Unknown opcode: ox%X\n", c.opcode)
 	}
 }
+func (c *Chip8) decode0xE000() {
+	c.pc -= 2
+	switch c.opcode & 0x0FF {
+	case 0x009E: // Ex9E
+		c.setOpcodeInfo("EX9E", "KeyOp", "Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block);")
+		if c.key[c.v[c.getXFromOpcode()]] == 1 {
+			c.pc += 2
+		}
+	case 0x00A1: // ExA1
+		c.setOpcodeInfo("EXA1", "KeyOp", "Skips the next instruction if the key stored in VX is not pressed. (Usually the next instruction is a jump to skip a code block);")
+		if c.key[c.v[c.getXFromOpcode()]] != 1 {
+			c.pc += 2
+		}
+	}
+}
+
 func (c *Chip8) decode0xF000() {
 	switch c.opcode & 0x00FF {
 	case 0x0007:
