@@ -45,8 +45,8 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [ ] EXA1  
 [X] FX07  
 [ ] FX0A  
-[ ] FX15  
-[ ] FX18  
+[X] FX15  
+[X] FX18  
 [ ] FX1E  
 [ ] FX29  
 [ ] FX33  

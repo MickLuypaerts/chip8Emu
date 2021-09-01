@@ -90,9 +90,11 @@ func (c *Chip8) decode0xF000() {
 	case 0x000A: // Fx0A
 		c.pc -= 2
 	case 0x0015: // Fx15
-		c.pc -= 2
+		c.setOpcodeInfo("FX15", "Timer", "Sets the delay timer to VX.")
+		c.delayTimer = c.v[c.getXFromOpcode()]
 	case 0x0018: // Fx18
-		c.pc -= 2
+		c.setOpcodeInfo("FX18", "Sound", "Sets the sound timer to VX.")
+		c.soundTimer = c.v[c.getXFromOpcode()]
 	case 0x001E: // Fx1E
 		c.pc -= 2
 	case 0x0029: // Fx29
