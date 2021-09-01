@@ -88,5 +88,6 @@ func (c *Chip8) updateTimers() {
 
 func (c *Chip8) EmulateCycle() {
 	c.fetch()
+	c.decode()
 	c.updateTimers()
 }
