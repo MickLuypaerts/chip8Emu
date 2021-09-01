@@ -63,7 +63,6 @@ func (c *Chip8) decode() {
 		randSource := rand.NewSource(time.Now().UnixNano())
 		r := rand.New(randSource)
 		c.v[c.getXFromOpcode()] = byte(uint16(r.Intn(256)) & c.getNNFromOpcode())
-		c.pc -= 2
 	case 0xD000:
 		c.setOpcodeInfo("DXYN", "Disp", "Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.")
 		x := uint16(c.v[c.getXFromOpcode()])
@@ -95,7 +94,8 @@ func (c *Chip8) decode0xF000() {
 		c.setOpcodeInfo("FX18", "Sound", "Sets the sound timer to VX.")
 		c.soundTimer = c.v[c.getXFromOpcode()]
 	case 0x001E: // Fx1E
-		c.pc -= 2
+		c.setOpcodeInfo("FX1E", "MEM", "Adds VX to I. VF is not affected.")
+		c.i += uint16(c.v[c.getXFromOpcode()])
 	case 0x0029: // Fx29
 		c.pc -= 2
 	case 0x0033: // Fx33
