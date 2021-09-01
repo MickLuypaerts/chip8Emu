@@ -130,16 +130,6 @@ func (c *Chip8) decode0x8000() {
 		indexX := c.opcode & 0x0F00 >> 8
 		indexY := c.opcode & 0x00F0 >> 4
 		c.subtract(indexX, indexX, indexY)
-		/*
-			if c.v[indexX] > c.v[indexY] {
-				c.v[0xF] = 1
-			} else {
-				c.v[0xF] = 0
-			}
-			c.vChanged[0xF] = true
-			c.v[indexX] -= c.v[indexY]
-			c.vChanged[indexX] = true
-		*/
 	case 0x0006:
 		c.setOpcodeInfo("8XY6", "BitOp", "Stores the least significant bit of VX in VF and then shifts VX to the right by 1.")
 		index := c.opcode & 0x0F00 >> 8
