@@ -85,7 +85,8 @@ func (c *Chip8) decode() {
 func (c *Chip8) decode0xF000() {
 	switch c.opcode & 0x00FF {
 	case 0x0007: // Fx07
-		c.pc -= 2
+		c.setOpcodeInfo("FX07", "Timer", "Sets VX to the value of the delay timer.")
+		c.v[c.getXFromOpcode()] = c.delayTimer
 	case 0x000A: // Fx0A
 		c.pc -= 2
 	case 0x0015: // Fx15
