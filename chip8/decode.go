@@ -93,11 +93,18 @@ func (c *Chip8) decode0xF000() {
 	case 0x0018:
 		c.setOpcodeInfo("FX18", "Sound", "Sets the sound timer to VX.")
 		c.soundTimer = c.v[c.getXFromOpcode()]
-	case 0x001E: // Fx1E
+	case 0x001E:
 		c.setOpcodeInfo("FX1E", "MEM", "Adds VX to I. VF is not affected.")
 		c.i += uint16(c.v[c.getXFromOpcode()])
-	case 0x0029: // Fx29
-		c.pc -= 2
+	case 0x0029: // TODO: Fx29 check implementation
+		c.setOpcodeInfo("FX29", "MEM", "Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.")
+		var loc uint16
+		for i := uint16(0x0); i < 0x10; i++ {
+			if c.getXFromOpcode() == i {
+				c.i = loc
+			}
+			loc += 5
+		}
 	case 0x0033: // Fx33
 		c.setOpcodeInfo("FX33", "BCD", "Stores the binary-coded decimal representation of VX, with the most significant of three digits at the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2. (In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.);")
 		/*
