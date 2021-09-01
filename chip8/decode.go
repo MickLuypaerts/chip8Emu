@@ -76,18 +76,31 @@ func (c *Chip8) decode() {
 		// Ex9E
 		// ExA1
 	case 0xF000:
-		c.pc -= 2
-		// Fx07
-		// Fx0A
-		// Fx15
-		// Fx18
-		// Fx1E
-		// Fx29
-		// Fx33
-		// Fx55
-		// Fx65
+		c.decode0xF000()
 	default:
 		log.Printf("[ERROR]: Unknown opcode: ox%X\n", c.opcode)
+	}
+}
+func (c *Chip8) decode0xF000() {
+	switch c.opcode & 0x00FF {
+	case 0x0007: // Fx07
+		c.pc -= 2
+	case 0x000A: // Fx0A
+		c.pc -= 2
+	case 0x0015: // Fx15
+		c.pc -= 2
+	case 0x0018: // Fx18
+		c.pc -= 2
+	case 0x001E: // Fx1E
+		c.pc -= 2
+	case 0x0029: // Fx29
+		c.pc -= 2
+	case 0x0033: // Fx33
+		c.pc -= 2
+	case 0x0055: // Fx55
+		c.pc -= 2
+	case 0x0065: // Fx65
+		c.pc -= 2
 	}
 }
 
