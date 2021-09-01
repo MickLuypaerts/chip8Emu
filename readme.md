@@ -8,7 +8,12 @@ in modern CHIP-8 implementations, where the interpreter is running natively outs
 # stack
 The stack is an array of 16 16-bit values, used to store the address that the interpreter shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
 
+# Timers 
+Timers
+CHIP-8 has two timers. They both count down at 60 hertz, until they reach 0.
 
+Delay timer: This timer is intended to be used for timing the events of games. Its value can be set and read.
+Sound timer: This timer is used for sound effects. When its value is nonzero, a beeping sound is made.
 
 # packages
 https://github.com/gizak/termui/

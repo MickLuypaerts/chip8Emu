@@ -42,6 +42,7 @@ func (c Chip8) GetProgStats() []string {
 		fmt.Sprintf("OPCODE: 0x%04X", c.opcode),
 		fmt.Sprintf("PC: %d", c.pc),
 		fmt.Sprintf("Index: %d", c.i),
+		fmt.Sprintf("Sound: %v", c.info.playingSound),
 	}
 	return progStats
 }
