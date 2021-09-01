@@ -70,6 +70,12 @@ func (c *Chip8) Init(file string) error {
 	return nil
 }
 
+func (c *Chip8) clearScreen() {
+	for i := range c.screenBuf {
+		c.screenBuf[i] = 0
+	}
+}
+
 func (c *Chip8) fetch() {
 	c.opcode = uint16(c.memory[c.pc])<<8 | uint16(c.memory[c.pc+1])
 }

@@ -8,7 +8,8 @@ func (c *Chip8) decode0x000() {
 	// 00EE
 	switch c.opcode & 0x00FF {
 	case 0x00E0: // 00E0
-
+		c.clearScreen()
+		c.pc += 2
 	case 0x00EE: // 00EE
 	default:
 		c.pc += 2 // 0nnn
