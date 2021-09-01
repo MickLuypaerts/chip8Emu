@@ -16,7 +16,12 @@ Delay timer: This timer is intended to be used for timing the events of games. I
 Sound timer: This timer is used for sound effects. When its value is nonzero, a beeping sound is made.
 
 
-# Opcodes
+# TODO
+[X] Screen
+[ ] Input
+[ ] Sound
+
+## Opcodes
 [X] 0NNN  
 [X] 00E0  
 [X] 00EE  
@@ -53,5 +58,10 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] FX55  
 [X] FX65  
 
+
 # packages
 https://github.com/gizak/termui/
+
+
+
+https://www.reddit.com/r/EmuDev/comments/osgerb/chip8_fx0a_never_getting_called/h6oeouj/
