@@ -98,8 +98,13 @@ func (c *Chip8) decode0xF000() {
 		c.pc -= 2
 	case 0x0033: // Fx33
 		c.pc -= 2
-	case 0x0055: // Fx55
-		c.pc -= 2
+	case 0x0055: // TODO: FX55 should we increment I here?
+		c.setOpcodeInfo("FX55", "MEM", "Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
+		for i := 0; i <= int(c.getXFromOpcode()); i++ {
+			c.memory[c.i] = c.v[i]
+			c.i++
+		}
+		c.i++
 	case 0x0065: // Fx65
 		c.pc -= 2
 	}

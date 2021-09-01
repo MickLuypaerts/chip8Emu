@@ -50,7 +50,7 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [ ] FX1E  
 [ ] FX29  
 [ ] FX33  
-[ ] FX55  
+[X] FX55  
 [ ] FX65  
 
 # packages
