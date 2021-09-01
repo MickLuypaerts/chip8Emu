@@ -90,8 +90,11 @@ func main() {
 			lMem.ScrollTop()
 		case "G", "<End>":
 			lMem.ScrollBottom()
-		case "r":
-
+		case "s":
+			chip8.EmulateCycle()
+			lProgStats.Rows = chip8.GetProgStats()
+			lGPR.Rows = chip8.GetGPRValues()
+			lMem.Rows = chip8.GetMemoryValues()
 		}
 
 		if previousKey == "g" {

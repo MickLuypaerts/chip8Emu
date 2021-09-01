@@ -61,3 +61,11 @@ func (c *Chip8) Init(file string) error {
 	}
 	return nil
 }
+
+func (c *Chip8) Fetch() {
+	c.opcode = uint16(c.memory[c.pc])<<8 | uint16(c.memory[c.pc+1])
+}
+
+func (c *Chip8) EmulateCycle() {
+	c.Fetch()
+}
