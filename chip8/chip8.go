@@ -23,6 +23,7 @@ type Chip8 struct {
 	v          [vRegSize]byte // general purpose registers
 	vChanged   [vRegSize]bool
 	screenBuf  [screenWidth * screenHeigth]byte
+	DrawFlag   bool
 	key        [keyNumbers]byte
 	delayTimer byte
 	soundTimer byte

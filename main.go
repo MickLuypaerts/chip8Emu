@@ -3,11 +3,13 @@ package main
 import (
 	"chip8/chip8"
 	"fmt"
+	"image"
 	"log"
 	"os"
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
+	//"github.com/gizak/termui/v3/widgets"
 )
 
 func main() {
@@ -100,6 +102,7 @@ func main() {
 			lMem.ScrollBottom()
 		case "s":
 			chip8.EmulateCycle()
+			updateCanvas(c, chip8)
 			lProgStats.Rows = chip8.GetProgStats()
 			lGPR.Rows = chip8.GetGPRValues()
 			lMem.Rows = chip8.GetMemoryValues()
@@ -114,8 +117,31 @@ func main() {
 		ui.Render(grid)
 	}
 
+	/*
+		for {
+			var wait string
+
+			fmt.Scanln(&wait)
+			chip8.EmulateCycle()
+
+		}*/
 }
 
 func usage() {
 	fmt.Printf("Usage: %s [FILE]\n", os.Args[0])
+}
+
+func updateCanvas(c *ui.Canvas, c8 chip8.Chip8) {
+	xOffSet := 2
+	yOffSet := 4
+	screenBuffer, width, height := c8.GetScreen()
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			if screenBuffer[x+(y*width)] != 0 {
+				c.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorRed)
+			} else {
+				c.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorWhite)
+			}
+		}
+	}
 }

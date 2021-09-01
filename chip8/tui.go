@@ -47,6 +47,10 @@ func (c Chip8) GetMemoryValues() []string {
 	return mem
 }
 
+func (c Chip8) GetScreen() ([screenWidth * screenHeigth]byte, int, int) {
+	return c.screenBuf, screenWidth, screenHeigth
+}
+
 func (c Chip8) GetProgStats() []string {
 	progStats := []string{
 		fmt.Sprintf("OPCODE: 0x%04X", c.opcode),
@@ -54,7 +58,7 @@ func (c Chip8) GetProgStats() []string {
 		fmt.Sprintf("Type: %s", c.info.opcodeType),
 		fmt.Sprintf("Desc: %s", c.info.opcodeDesc),
 		fmt.Sprintf("PC: %d", c.pc),
-		fmt.Sprintf("Index: %d", c.i),
+		fmt.Sprintf("Index: %04X", c.i),
 		fmt.Sprintf("Sound: %v", c.info.playingSound),
 	}
 	return progStats
