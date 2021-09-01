@@ -15,6 +15,16 @@ func (c *Chip8) GetGPRValues() []string {
 	return gpr
 }
 
+func (c Chip8) GetStackValues() []string {
+	var stack []string
+
+	for i := range c.stack {
+		stack = append(stack, fmt.Sprintf("%X: 0x%04X", i, c.stack[i]))
+	}
+	stack = append(stack, fmt.Sprintf("SP: %X", c.sp))
+	return stack
+}
+
 func (c Chip8) GetMemoryValues() []string {
 	var mem []string
 	var row string
@@ -40,6 +50,9 @@ func (c Chip8) GetMemoryValues() []string {
 func (c Chip8) GetProgStats() []string {
 	progStats := []string{
 		fmt.Sprintf("OPCODE: 0x%04X", c.opcode),
+		fmt.Sprintf("Name:     %s", c.info.opcodeName),
+		fmt.Sprintf("Type: %s", c.info.opcodeType),
+		fmt.Sprintf("Desc: %s", c.info.opcodeDesc),
 		fmt.Sprintf("PC: %d", c.pc),
 		fmt.Sprintf("Index: %d", c.i),
 		fmt.Sprintf("Sound: %v", c.info.playingSound),

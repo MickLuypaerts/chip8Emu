@@ -29,11 +29,18 @@ func main() {
 
 	// Elements
 	lGPR := widgets.NewList()
-	lGPR.Title = "registers"
+	lGPR.Title = "Registers"
 	lGPR.Rows = chip8.GetGPRValues()
 	lGPR.TextStyle = ui.NewStyle(ui.ColorYellow)
 	lGPR.WrapText = false
 	lGPR.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
+
+	lStack := widgets.NewList()
+	lStack.Title = "Stack"
+	lStack.Rows = chip8.GetStackValues()
+	lStack.TextStyle = ui.NewStyle(ui.ColorYellow)
+	lStack.WrapText = false
+	lStack.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 
 	lMem := widgets.NewList()
 	lMem.Title = "Memory"
@@ -57,7 +64,8 @@ func main() {
 			ui.NewCol(1.0/4, lProgStats), // TODO: Screen
 		),
 		ui.NewRow(1.0/3,
-			ui.NewCol(1.0/4, lGPR),
+			ui.NewCol(0.5/4, lGPR),
+			ui.NewCol(0.5/4, lStack),
 			ui.NewCol(3.0/4, lMem),
 		),
 	)
@@ -95,6 +103,7 @@ func main() {
 			lProgStats.Rows = chip8.GetProgStats()
 			lGPR.Rows = chip8.GetGPRValues()
 			lMem.Rows = chip8.GetMemoryValues()
+			lStack.Rows = chip8.GetStackValues()
 		}
 
 		if previousKey == "g" {

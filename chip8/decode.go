@@ -8,12 +8,15 @@ func (c *Chip8) decode0x000() {
 	// 00EE
 	switch c.opcode & 0x00FF {
 	case 0x00E0: // 00E0
+		c.setOpcodeInfo("00E0", "Display", "Clears the screen.")
 		c.clearScreen()
 		c.pc += 2
 	case 0x00EE: // 00EE
+		c.setOpcodeInfo("00EE", "Flow", "Returns from a subroutine.")
 		c.pc = c.stack[c.sp]
 		c.sp--
 	default:
+		c.setOpcodeInfo("0NNN", "Call", "Calls machine code routine. Not implemented")
 		c.pc += 2 // 0nnn
 	}
 }

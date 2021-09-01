@@ -31,11 +31,20 @@ type Chip8 struct {
 }
 
 type chip8Info struct {
+	opcodeName   string
+	opcodeType   string
+	opcodeDesc   string
 	playingSound bool
 }
 
+func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
+	c.info.opcodeName = n
+	c.info.opcodeType = t
+	c.info.opcodeDesc = d
+}
+
 func (c *Chip8) Init(file string) error {
-	c.opcode = 0x200 // programs written for the original system begin at memory location 512 (0x200)
+	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
 	romData, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
