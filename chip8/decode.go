@@ -54,8 +54,8 @@ func (c *Chip8) decode() {
 		c.setOpcodeInfo("ANNN", "MEM", "Sets I to the address NNN.")
 		c.i = c.getNNNFromOpcode()
 	case 0xB000:
-		// Bnnn
-		c.pc -= 2
+		c.setOpcodeInfo("BNNN", "Flow", "Jumps to the address NNN plus V0.")
+		c.pc = c.getNNNFromOpcode() + uint16(c.v[0x0])
 	case 0xC000:
 		// Cxkk
 		c.pc -= 2
