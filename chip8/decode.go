@@ -15,17 +15,14 @@ func (c *Chip8) decode() {
 		c.pc = c.getNNNFromOpcode()
 	case 0x2000:
 		c.setOpcodeInfo("2NNN", "Flow", "Calls subroutine at NNN.")
-
 		c.stack[c.sp] = c.pc
 		c.sp++
 		c.pc = c.getNNNFromOpcode()
 	case 0x3000:
 		c.setOpcodeInfo("3XNN", "Cond", "Skips the next instruction if VX equals NN. (Usually the next instruction is a jump to skip a code block);")
-		// index := c.opcode & 0x0F00 >> 8
 		if c.v[c.getXFromOpcode()] == byte(c.getNNFromOpcode()) {
 			c.pc += 2
 		}
-
 	case 0x4000:
 		c.setOpcodeInfo("4XNN", "Cond", "Skips the next instruction if VX does not equal NN. (Usually the next instruction is a jump to skip a code block);")
 		if c.v[c.getXFromOpcode()] != byte(c.getNNFromOpcode()) {
@@ -36,19 +33,16 @@ func (c *Chip8) decode() {
 		if c.v[c.getXFromOpcode()] == c.v[c.getYFromOpcode()] {
 			c.pc += 2
 		}
-
-	case 0x6000: // 6xkk
+	case 0x6000:
 		c.setOpcodeInfo("6XNN", "Const", "Sets VX to NN.")
 		index := c.getXFromOpcode()
 		c.v[index] = byte(c.getNNFromOpcode())
 		c.vChanged[index] = true
 	case 0x7000:
 		c.setOpcodeInfo("7XNN", "Const", "Adds NN to VX. (Carry flag is not changed);")
-		// index := (c.opcode & 0x0F00) >> 8
 		index := c.getXFromOpcode()
 		c.v[index] += byte(c.getNNFromOpcode())
 		c.vChanged[index] = true
-		// 7xkk
 	case 0x8000:
 		c.decode0x8000()
 	case 0x9000:
@@ -84,15 +78,15 @@ func (c *Chip8) decode() {
 }
 func (c *Chip8) decode0xF000() {
 	switch c.opcode & 0x00FF {
-	case 0x0007: // Fx07
+	case 0x0007:
 		c.setOpcodeInfo("FX07", "Timer", "Sets VX to the value of the delay timer.")
 		c.v[c.getXFromOpcode()] = c.delayTimer
 	case 0x000A: // Fx0A
 		c.pc -= 2
-	case 0x0015: // Fx15
+	case 0x0015:
 		c.setOpcodeInfo("FX15", "Timer", "Sets the delay timer to VX.")
 		c.delayTimer = c.v[c.getXFromOpcode()]
-	case 0x0018: // Fx18
+	case 0x0018:
 		c.setOpcodeInfo("FX18", "Sound", "Sets the sound timer to VX.")
 		c.soundTimer = c.v[c.getXFromOpcode()]
 	case 0x001E: // Fx1E
@@ -100,7 +94,17 @@ func (c *Chip8) decode0xF000() {
 	case 0x0029: // Fx29
 		c.pc -= 2
 	case 0x0033: // Fx33
-		c.pc -= 2
+		c.setOpcodeInfo("FX33", "BCD", "Stores the binary-coded decimal representation of VX, with the most significant of three digits at the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2. (In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.);")
+		/*
+			Store BCD representation of Vx in I
+			take decimal number of Vx and place
+			X00 = I
+			0X0 = I+1
+			00X = I+2
+		*/
+		c.memory[c.i] = c.v[c.getXFromOpcode()] / 100
+		c.memory[c.i+1] = (c.v[c.getXFromOpcode()] / 10) % 10
+		c.memory[c.i+2] = (c.v[c.getXFromOpcode()] % 100) % 10
 	case 0x0055: // TODO: FX55 should we increment I here?
 		c.setOpcodeInfo("FX55", "MEM", "Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
 		for i := 0; i <= int(c.getXFromOpcode()); i++ {
@@ -108,8 +112,13 @@ func (c *Chip8) decode0xF000() {
 			c.i++
 		}
 		c.i++
-	case 0x0065: // Fx65
-		c.pc -= 2
+	case 0x0065: // TODO: FX65 should we increment I here?
+		c.setOpcodeInfo("FX65", "MEM", "Fills V0 to VX (including VX) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
+		for i := 0; i <= int(c.getXFromOpcode()); i++ {
+			c.v[i] = c.memory[c.i]
+			c.i++
+		}
+		c.i++
 	}
 }
 
@@ -212,7 +221,6 @@ func (c *Chip8) draw(x, y, h uint16) {
 				}
 				c.screenBuf[x+uint16(xLine)+((y+uint16(yLine))*screenWidth)] ^= 1
 			}
-
 		}
 	}
 	c.DrawFlag = true

@@ -49,9 +49,9 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] FX18  
 [ ] FX1E  
 [ ] FX29  
-[ ] FX33  
+[X] FX33  
 [X] FX55  
-[ ] FX65  
+[X] FX65  
 
 # packages
 https://github.com/gizak/termui/
