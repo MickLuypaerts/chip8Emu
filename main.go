@@ -42,7 +42,7 @@ func main() {
 	lMem.Rows = chip8.GetMemoryValues()
 
 	lProgStats := widgets.NewList()
-	lProgStats.Title = "INFO"
+	lProgStats.Title = fmt.Sprintf("INFO %s", os.Args[1])
 	lProgStats.WrapText = true
 	lProgStats.Rows = chip8.GetProgStats()
 
@@ -101,6 +101,7 @@ func main() {
 		}
 		ui.Render(grid)
 	}
+
 }
 
 func usage() {
