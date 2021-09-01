@@ -6,6 +6,7 @@ import (
 )
 
 func (c *Chip8) decode() {
+	c.pc += 2
 	switch c.opcode & 0xF000 {
 	case 0x0000:
 		c.decode0x000()
@@ -24,33 +25,28 @@ func (c *Chip8) decode() {
 		if c.v[index] == byte(c.opcode&0x00FF) {
 			c.pc += 2
 		}
-		c.pc += 2
 
 	case 0x4000:
 		c.setOpcodeInfo("4XNN", "Cond", "Skips the next instruction if VX does not equal NN. (Usually the next instruction is a jump to skip a code block);")
 		if c.v[c.opcode&0x0F00>>8] != byte(c.opcode&0x00FF) {
 			c.pc += 2
 		}
-		c.pc += 2
 	case 0x5000:
 		c.setOpcodeInfo("5XY0", "Cond", "Skips the next instruction if VX equals VY. (Usually the next instruction is a jump to skip a code block);")
 		if c.v[c.opcode&0x0F00>>8] == c.v[c.opcode&0x00F0>>4] {
 			c.pc += 2
 		}
-		c.pc += 2
 
 	case 0x6000: // 6xkk
 		c.setOpcodeInfo("6XNN", "Const", "Sets VX to NN.")
 		index := c.opcode & 0x0F00 >> 8
 		c.v[index] = byte(c.opcode & 0x00FF)
 		c.vChanged[index] = true
-		c.pc += 2
 	case 0x7000:
 		c.setOpcodeInfo("7XNN", "Const", "Adds NN to VX. (Carry flag is not changed);")
 		index := (c.opcode & 0x0F00) >> 8
 		c.v[index] += byte(c.opcode & 0x00FF)
 		c.vChanged[index] = true
-		c.pc += 2
 		// 7xkk
 	case 0x8000:
 		// 8xy0
@@ -67,11 +63,9 @@ func (c *Chip8) decode() {
 		if c.v[c.opcode&0x0F00>>8] != c.v[c.opcode&0x00F0>>4] {
 			c.pc += 2
 		}
-		c.pc += 2
 	case 0xA000:
 		c.setOpcodeInfo("ANNN", "MEM", "Sets I to the address NNN.")
 		c.i = c.opcode & 0x0FFF
-		c.pc += 2
 	case 0xB000:
 		// Bnnn
 	case 0xC000:
@@ -82,7 +76,6 @@ func (c *Chip8) decode() {
 		y := uint16(c.v[(c.opcode&0x00F0)>>4])
 		h := uint16(c.opcode & 0x000F)
 		c.draw(x, y, h)
-		c.pc += 2
 		// Dxyn
 	case 0xE000:
 		// Ex9E
@@ -110,14 +103,12 @@ func (c *Chip8) decode0x000() {
 	case 0x00E0:
 		c.setOpcodeInfo("00E0", "Display", "Clears the screen.")
 		c.clearScreen()
-		c.pc += 2
 	case 0x00EE:
 		c.setOpcodeInfo("00EE", "Flow", "Returns from a subroutine.")
 		c.sp--
 		c.pc = c.stack[c.sp]
 	default:
 		c.setOpcodeInfo("0NNN", "Call", "Calls machine code routine. Not implemented")
-		c.pc += 2
 	}
 }
 
