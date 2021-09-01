@@ -82,12 +82,12 @@ func (c *Chip8) decode() {
 func (c *Chip8) decode0xE000() {
 	c.pc -= 2
 	switch c.opcode & 0x0FF {
-	case 0x009E: // Ex9E
+	case 0x009E:
 		c.setOpcodeInfo("EX9E", "KeyOp", "Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block);")
 		if c.key[c.v[c.getXFromOpcode()]] == 1 {
 			c.pc += 2
 		}
-	case 0x00A1: // ExA1
+	case 0x00A1:
 		c.setOpcodeInfo("EXA1", "KeyOp", "Skips the next instruction if the key stored in VX is not pressed. (Usually the next instruction is a jump to skip a code block);")
 		if c.key[c.v[c.getXFromOpcode()]] != 1 {
 			c.pc += 2
