@@ -15,5 +15,43 @@ CHIP-8 has two timers. They both count down at 60 hertz, until they reach 0.
 Delay timer: This timer is intended to be used for timing the events of games. Its value can be set and read.
 Sound timer: This timer is used for sound effects. When its value is nonzero, a beeping sound is made.
 
+
+# Opcodes
+[X] 0NNN  
+[X] 00E0  
+[X] 00EE  
+[X] 1NNN  
+[X] 2NNN  
+[X] 3XNN  
+[X] 4XNN  
+[X] 5XY0  
+[X] 6XNN  
+[X] 7XNN  
+[X] 8XY0  
+[X] 8XY1  
+[X] 8XY2  
+[X] 8XY3  
+[X] 8XY4  
+[ ] 8XY5  
+[ ] 8XY6  
+[ ] 8XY7  
+[ ] 8XYE  
+[X] 9XY0  
+[X] ANNN  
+[ ] BNNN  
+[ ] CXNN  
+[X] DXYN  
+[ ] EX9E  
+[ ] EXA1  
+[ ] FX07  
+[ ] FX0A  
+[ ] FX15  
+[ ] FX18  
+[ ] FX1E  
+[ ] FX29  
+[ ] FX33  
+[ ] FX55  
+[ ] FX65  
+
 # packages
 https://github.com/gizak/termui/

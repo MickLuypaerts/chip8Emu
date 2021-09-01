@@ -9,7 +9,7 @@ func (c *Chip8) decode() {
 	c.pc += 2
 	switch c.opcode & 0xF000 {
 	case 0x0000:
-		c.decode0x000()
+		c.decode0x0000()
 	case 0x1000:
 		c.setOpcodeInfo("1NNN", "Flow", "Jumps to address NNN.")
 		c.pc = c.opcode & 0x0FFF
@@ -49,15 +49,7 @@ func (c *Chip8) decode() {
 		c.vChanged[index] = true
 		// 7xkk
 	case 0x8000:
-		// 8xy0
-		// 8xy1
-		// 8xy2
-		// 8xy3
-		// 8xy4
-		// 8xy5
-		// 8xy6
-		// 8xy7
-		// 8xyE
+		c.decode0x8000()
 	case 0x9000:
 		c.setOpcodeInfo("9XY0", "Cond", "Skips the next instruction if VX does not equal VY. (Usually the next instruction is a jump to skip a code block);")
 		if c.v[c.opcode&0x0F00>>8] != c.v[c.opcode&0x00F0>>4] {
@@ -68,8 +60,10 @@ func (c *Chip8) decode() {
 		c.i = c.opcode & 0x0FFF
 	case 0xB000:
 		// Bnnn
+		c.pc -= 2
 	case 0xC000:
 		// Cxkk
+		c.pc -= 2
 	case 0xD000:
 		c.setOpcodeInfo("DXYN", "Disp", "Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.")
 		x := uint16(c.v[(c.opcode&0x0F00)>>8])
@@ -78,9 +72,11 @@ func (c *Chip8) decode() {
 		c.draw(x, y, h)
 		// Dxyn
 	case 0xE000:
+		c.pc -= 2
 		// Ex9E
 		// ExA1
 	case 0xF000:
+		c.pc -= 2
 		// Fx07
 		// Fx0A
 		// Fx15
@@ -95,10 +91,59 @@ func (c *Chip8) decode() {
 	}
 }
 
-func (c *Chip8) decode0x000() {
-	// 0nnn
-	// 00E0
-	// 00EE
+func (c *Chip8) decode0x8000() {
+	switch c.opcode & 0x000F {
+	case 0x0000:
+		c.setOpcodeInfo("8XY0", "Assig", "Sets VX to the value of VY.")
+		index := c.opcode & 0x0F00 >> 8
+		c.v[index] = c.v[c.opcode&0x00F0>>4]
+		c.vChanged[index] = true
+	case 0x0001:
+		c.setOpcodeInfo("8XY1", "BitOp", "Sets VX to VX or VY. (Bitwise OR operation);")
+		index := c.opcode & 0x0F00 >> 8
+		c.v[index] |= c.v[c.opcode&0x00F0>>4]
+		c.vChanged[index] = true
+	case 0x0002:
+		c.setOpcodeInfo("8XY2", "BitOp", "Sets VX to VX and VY. (Bitwise AND operation);")
+		index := c.opcode & 0x0F00 >> 8
+		c.v[index] &= c.v[c.opcode&0x00F0>>4]
+		c.vChanged[index] = true
+	case 0x0003:
+		c.setOpcodeInfo("8XY3", "BitOp", "Sets VX to VX xor VY. (Bitwise XOR operation);")
+		index := c.opcode & 0x0F00 >> 8
+		c.v[index] ^= c.v[c.opcode&0x00F0>>4]
+		c.vChanged[index] = true
+	case 0x0004:
+		c.setOpcodeInfo("8XY4", "Math", "Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there is not.")
+		indexX := c.opcode & 0x0F00 >> 8
+		indexY := c.opcode & 0x00F0 >> 4
+		if c.v[indexX] > (0xFF - c.v[indexY]) {
+			c.v[0xF] = 1
+		} else {
+			c.v[0xF] = 0
+		}
+		c.vChanged[0xF] = true
+		c.v[indexX] += c.v[indexY]
+		c.vChanged[indexX] = true
+	case 0x0005:
+		// 8xy5
+		c.pc -= 2
+	case 0x0006:
+		// 8xy6
+		c.pc -= 2
+	case 0x0007:
+		// 8xy7
+		c.pc -= 2
+	case 0x000E:
+		// 8xyE
+		c.pc -= 2
+	default:
+		log.Printf("[ERROR]: Unknown opcode: ox%X\n", c.opcode)
+
+	}
+}
+
+func (c *Chip8) decode0x0000() {
 	switch c.opcode & 0x00FF {
 	case 0x00E0:
 		c.setOpcodeInfo("00E0", "Display", "Clears the screen.")
@@ -120,6 +165,7 @@ func (c *Chip8) draw(x, y, h uint16) {
 			if (pixel & (0x80 >> xLine)) != 0 {
 				if c.screenBuf[(x+uint16(xLine)+((y+uint16(yLine))*screenWidth))] == 1 { // Check if the pixel on the display is set to 1. If it is set,
 					c.v[0xF] = 1 // we need to register the collision by setting the VF register
+					c.vChanged[0xF] = true
 				}
 				c.screenBuf[x+uint16(xLine)+((y+uint16(yLine))*screenWidth)] ^= 1
 			}
