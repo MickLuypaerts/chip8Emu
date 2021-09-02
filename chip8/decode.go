@@ -101,6 +101,7 @@ func (c *Chip8) decode0xF000() {
 		c.setOpcodeInfo("FX07", "Timer", "Sets VX to the value of the delay timer.")
 		c.v[c.getXFromOpcode()] = c.delayTimer
 	case 0x000A: // Fx0A
+		// FX0A  KeyOp  A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event);
 		c.pc -= 2
 	case 0x0015:
 		c.setOpcodeInfo("FX15", "Timer", "Sets the delay timer to VX.")
