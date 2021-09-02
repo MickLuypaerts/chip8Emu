@@ -244,11 +244,14 @@ func (c *Chip8) draw(x, y, h uint16) {
 		pixel = uint16(c.memory[c.i+uint16(yLine)]) // Fetch the pixel value from the memory starting at location I
 		for xLine := 0; xLine < 8; xLine++ {
 			if (pixel & (0x80 >> xLine)) != 0 {
-				if c.screenBuf[(x+uint16(xLine)+((y+uint16(yLine))*screenWidth))] == 1 { // Check if the pixel on the display is set to 1. If it is set,
-					c.v[0xF] = 1 // we need to register the collision by setting the VF register
-					c.vChanged[0xF] = true
+				index := (x + uint16(xLine) + ((y + uint16(yLine)) * screenWidth))
+				if index < uint16(len(c.screenBuf)) {
+					if c.screenBuf[index] == 1 { // Check if the pixel on the display is set to 1. If it is set,
+						c.v[0xF] = 1 // we need to register the collision by setting the VF register
+						c.vChanged[0xF] = true
+					}
+					c.screenBuf[x+uint16(xLine)+((y+uint16(yLine))*screenWidth)] ^= 1
 				}
-				c.screenBuf[x+uint16(xLine)+((y+uint16(yLine))*screenWidth)] ^= 1
 			}
 		}
 	}
