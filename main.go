@@ -91,20 +91,10 @@ func main() {
 			lMem.ScrollDown()
 		case "k", "<Up>":
 			lMem.ScrollUp()
-		case "<C-d>":
-			lMem.ScrollHalfPageDown()
-		case "<C-u>":
-			lMem.ScrollHalfPageUp()
-		case "<C-f>":
-			lMem.ScrollPageDown()
-		case "<C-b>":
-			lMem.ScrollPageUp()
 		case "g":
 			if previousKey == "g" {
 				lMem.ScrollTop()
 			}
-		case "<Home>":
-			lMem.ScrollTop()
 		case "G", "<End>":
 			lMem.ScrollBottom()
 		case "s":
@@ -131,6 +121,16 @@ func main() {
 
 func usage() {
 	fmt.Printf("Usage: %s [FILE]\n", os.Args[0])
+	fmt.Printf("\n")
+	fmt.Printf("Controls:\n")
+	fmt.Printf("|key|  function  |\n")
+	fmt.Printf("|---|------------|\n")
+	fmt.Printf("| q |    quit    |\n")
+	fmt.Printf("| s |  1 cycle   |\n")
+	fmt.Printf("| j |Mem map down|\n")
+	fmt.Printf("| k | Mem map up |\n")
+	fmt.Printf("| gg|Mem map top |\n")
+	fmt.Printf("| G |Mem map top |\n")
 }
 
 func updateCanvas(c *ui.Canvas, c8 chip8.Chip8) {
