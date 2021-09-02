@@ -15,15 +15,15 @@ const (
 )
 
 type TUI struct {
-	LGPR       *widgets.List
-	LKeys      *widgets.List
-	LStack     *widgets.List
+	lGPR       *widgets.List
+	lKeys      *widgets.List
+	lStack     *widgets.List
 	LMem       *widgets.List
-	LProgStats *widgets.List
-	Canvas     *ui.Canvas
+	lProgStats *widgets.List
+	canvas     *ui.Canvas
 	Grid       *ui.Grid
-	TermWidth  int
-	TermHeight int
+	termWidth  int
+	termHeight int
 }
 
 type chip interface {
@@ -48,30 +48,30 @@ func (t *TUI) Init(c chip) {
 }
 
 func (t *TUI) initLGPR(getGPRValues func() []string) {
-	t.LGPR = widgets.NewList()
-	t.LGPR.Title = "Registers"
-	t.LGPR.Rows = getGPRValues()
-	t.LGPR.TextStyle = ui.NewStyle(ui.ColorYellow)
-	t.LGPR.WrapText = false
-	t.LGPR.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
+	t.lGPR = widgets.NewList()
+	t.lGPR.Title = "Registers"
+	t.lGPR.Rows = getGPRValues()
+	t.lGPR.TextStyle = ui.NewStyle(ui.ColorYellow)
+	t.lGPR.WrapText = false
+	t.lGPR.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
 
 func (t *TUI) initLKeys(getKeyValues func() []string) {
-	t.LKeys = widgets.NewList()
-	t.LKeys.Title = "Keys"
-	t.LKeys.Rows = getKeyValues()
-	t.LKeys.TextStyle = ui.NewStyle(ui.ColorYellow)
-	t.LKeys.WrapText = false
-	t.LKeys.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
+	t.lKeys = widgets.NewList()
+	t.lKeys.Title = "Keys"
+	t.lKeys.Rows = getKeyValues()
+	t.lKeys.TextStyle = ui.NewStyle(ui.ColorYellow)
+	t.lKeys.WrapText = false
+	t.lKeys.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
 
 func (t *TUI) initLStack(getStackValues func() []string) {
-	t.LStack = widgets.NewList()
-	t.LStack.Title = "Stack"
-	t.LStack.Rows = getStackValues()
-	t.LStack.TextStyle = ui.NewStyle(ui.ColorYellow)
-	t.LStack.WrapText = false
-	t.LStack.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
+	t.lStack = widgets.NewList()
+	t.lStack.Title = "Stack"
+	t.lStack.Rows = getStackValues()
+	t.lStack.TextStyle = ui.NewStyle(ui.ColorYellow)
+	t.lStack.WrapText = false
+	t.lStack.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
 func (t *TUI) initLMem(getMemoryValues func() []string, getMemoryRow func() uint16) {
 	t.LMem = widgets.NewList()
@@ -82,27 +82,27 @@ func (t *TUI) initLMem(getMemoryValues func() []string, getMemoryRow func() uint
 	t.LMem.SelectedRow = int(getMemoryRow())
 }
 func (t *TUI) initLProgStats(getProgStats func() []string) {
-	t.LProgStats = widgets.NewList()
-	t.LProgStats.Title = fmt.Sprintf("INFO %s", os.Args[1])
-	t.LProgStats.WrapText = true
-	t.LProgStats.Rows = getProgStats()
+	t.lProgStats = widgets.NewList()
+	t.lProgStats.Title = fmt.Sprintf("INFO %s", os.Args[1])
+	t.lProgStats.WrapText = true
+	t.lProgStats.Rows = getProgStats()
 }
 func (t *TUI) initCanvas() {
-	t.Canvas = ui.NewCanvas()
+	t.canvas = ui.NewCanvas()
 }
 
 func (t *TUI) initGrid() {
 	t.Grid = ui.NewGrid()
-	t.Grid.SetRect(0, 0, t.TermWidth, t.TermHeight)
+	t.Grid.SetRect(0, 0, t.termWidth, t.termHeight)
 	t.Grid.Set(
 		ui.NewRow(2.0/3,
-			ui.NewCol(3.0/4, t.Canvas),
-			ui.NewCol(1.0/4, t.LProgStats),
+			ui.NewCol(3.0/4, t.canvas),
+			ui.NewCol(1.0/4, t.lProgStats),
 		),
 		ui.NewRow(1.0/3,
-			ui.NewCol(0.5/4, t.LGPR),
-			ui.NewCol(0.5/4, t.LStack),
-			ui.NewCol(0.5/4, t.LKeys),
+			ui.NewCol(0.5/4, t.lGPR),
+			ui.NewCol(0.5/4, t.lStack),
+			ui.NewCol(0.5/4, t.lKeys),
 			ui.NewCol(2.5/4, t.LMem),
 		),
 	)
@@ -110,16 +110,16 @@ func (t *TUI) initGrid() {
 }
 
 func (t *TUI) initTermSize() {
-	t.TermWidth, t.TermHeight = ui.TerminalDimensions()
+	t.termWidth, t.termHeight = ui.TerminalDimensions()
 }
 
 func (t *TUI) SetEmuInfo(c chip) {
-	t.LProgStats.Rows = c.GetProgStats()
-	t.LGPR.Rows = c.GetGPRValues()
+	t.lProgStats.Rows = c.GetProgStats()
+	t.lGPR.Rows = c.GetGPRValues()
 	t.LMem.Rows = c.GetMemoryValues()
 	t.LMem.SelectedRow = int(c.GetMemoryRow())
-	t.LStack.Rows = c.GetStackValues()
-	ui.Render(t.LProgStats, t.LGPR, t.LMem, t.LStack)
+	t.lStack.Rows = c.GetStackValues()
+	ui.Render(t.lProgStats, t.lGPR, t.LMem, t.lStack)
 }
 
 func (t *TUI) UpdateScreen(c chip) {
@@ -127,11 +127,11 @@ func (t *TUI) UpdateScreen(c chip) {
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
 			if screenBuffer[x+(y*width)] != 0 {
-				t.Canvas.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorRed)
+				t.canvas.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorRed)
 			} else {
-				t.Canvas.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorWhite)
+				t.canvas.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorWhite)
 			}
 		}
 	}
-	ui.Render(t.Canvas)
+	ui.Render(t.canvas)
 }
