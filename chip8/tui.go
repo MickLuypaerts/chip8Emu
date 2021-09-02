@@ -33,6 +33,10 @@ func (c Chip8) GetStackValues() []string {
 	return stack
 }
 
+const (
+	lMemRowLength = 16
+)
+
 func (c Chip8) GetMemoryValues() []string {
 	var mem []string
 	var row string
@@ -47,12 +51,16 @@ func (c Chip8) GetMemoryValues() []string {
 		}
 		row += fmt.Sprintf("%02X ", c.memory[i])
 		rowCount++
-		if rowCount == 16 {
+		if rowCount == lMemRowLength {
 			mem = append(mem, row)
 			rowCount = 0
 		}
 	}
 	return mem
+}
+
+func (c Chip8) GetMemoryRow() uint16 {
+	return uint16(c.pc / lMemRowLength)
 }
 
 func (c Chip8) GetScreen() ([screenWidth * screenHeigth]byte, int, int) {
