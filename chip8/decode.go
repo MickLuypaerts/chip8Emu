@@ -143,6 +143,7 @@ func (c *Chip8) decode0xF000() {
 		c.setOpcodeInfo("FX65", "MEM", "Fills V0 to VX (including VX) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
 		for i := 0; i <= int(c.getXFromOpcode()); i++ {
 			c.v[i] = c.memory[c.i]
+			c.vChanged[i] = true
 			c.i++
 		}
 		c.i++
