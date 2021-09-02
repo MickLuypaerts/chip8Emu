@@ -40,7 +40,6 @@ func main() {
 		case "q", "<C-c>":
 			return
 		case "j", "<Down>":
-			//TUI.LMem.ScrollDown()
 			view.ScrollDown(TUI.LMem)
 		case "k", "<Up>":
 			view.ScrollUp(TUI.LMem)
