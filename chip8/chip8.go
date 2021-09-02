@@ -13,8 +13,8 @@ const (
 	screenWidth    = 64
 	screenHeigth   = 32
 	keyNumbers     = 16
-	clockCycleRate = 1 * time.Second
-	timeCycleRate  = 1 * time.Second
+	clockCycleRate = 2 * time.Microsecond
+	timeCycleRate  = 16 * time.Microsecond
 )
 
 type Chip8 struct {
