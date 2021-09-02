@@ -8,3 +8,5 @@ rTest:
 
 rTetris:
 	chip8 ".\roms\Tetris [Fran Dachille, 1991].ch8"
+rPong:
+	chip8 ".\roms\Pong (1 player).ch8"
