@@ -252,7 +252,7 @@ func (c *Chip8) draw(x, y, h uint16) {
 			}
 		}
 	}
-	c.DrawFlag = true
+	c.drawFlag = true
 	c.vChanged[0xF] = true
 	//c.printScreenToConsole()
 }

@@ -32,6 +32,8 @@ func main() {
 	ui.Render(TUI.Grid)
 	previousKey := ""
 	uiEvents := ui.PollEvents()
+	chip8.ScreenFunc = TUI.UpdateScreen
+	chip8.InfoFunc = TUI.SetEmuInfo
 	for {
 		e := <-uiEvents
 		switch e.ID {
@@ -49,11 +51,13 @@ func main() {
 			TUI.LMem.ScrollBottom()
 		case "s":
 			chip8.EmulateCycle()
-			if chip8.DrawFlag {
-				TUI.UpdateScreen(&chip8)
-				chip8.DrawFlag = false
-			}
-			TUI.SetEmuInfo(&chip8)
+			//TUI.SetEmuInfo(&chip8)
+		case "r":
+			// run program
+			chip8.Run()
+		case "R":
+			// stop program
+			chip8.Stop <- true
 		}
 
 		if previousKey == "g" {
@@ -72,6 +76,8 @@ func usage() {
 	fmt.Printf("|---|------------|\n")
 	fmt.Printf("| q |    quit    |\n")
 	fmt.Printf("| s |  1 cycle   |\n")
+	fmt.Printf("| r |run program |\n")
+	fmt.Printf("| R |stop program|\n")
 	fmt.Printf("| j |Mem map down|\n")
 	fmt.Printf("| k | Mem map up |\n")
 	fmt.Printf("| gg|Mem map top |\n")

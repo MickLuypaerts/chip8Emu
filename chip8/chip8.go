@@ -1,16 +1,20 @@
 package chip8
 
 import (
+	"chip8/view"
 	"io/ioutil"
+	"time"
 )
 
 const (
-	memorySize   = 4096
-	vRegSize     = 16
-	stackSize    = 16
-	screenWidth  = 64
-	screenHeigth = 32
-	keyNumbers   = 16
+	memorySize     = 4096
+	vRegSize       = 16
+	stackSize      = 16
+	screenWidth    = 64
+	screenHeigth   = 32
+	keyNumbers     = 16
+	clockCycleRate = 1 * time.Second
+	timeCycleRate  = 1 * time.Second
 )
 
 type Chip8 struct {
@@ -23,12 +27,15 @@ type Chip8 struct {
 	v          [vRegSize]byte // general purpose registers
 	vChanged   [vRegSize]bool
 	screenBuf  [screenWidth * screenHeigth]byte
-	DrawFlag   bool
+	drawFlag   bool
 	key        [keyNumbers]byte
 	delayTimer byte
 	soundTimer byte
+	Stop       chan bool
 
-	info chip8Info
+	info       chip8Info
+	ScreenFunc func(view.Chip)
+	InfoFunc   func(view.Chip)
 }
 
 type chip8Info struct {
@@ -77,6 +84,7 @@ func (c *Chip8) Init(file string) error {
 	for i := range romData {
 		c.memory[i+512] = romData[i]
 	}
+	c.Stop = make(chan bool)
 	return nil
 }
 
@@ -106,8 +114,35 @@ func (c *Chip8) EmulateCycle() {
 	c.fetch()
 	c.decode()
 	c.updateTimers()
+	if c.drawFlag {
+		c.ScreenFunc(c)
+		c.drawFlag = false
+	}
+	c.InfoFunc(c)
 }
 
+func (c *Chip8) Run() {
+	clock := time.NewTicker(clockCycleRate)
+	timers := time.NewTicker(timeCycleRate)
+
+	go c.runCycle(c.EmulateCycle, clock)
+	go c.runCycle(c.updateTimers, timers)
+
+}
+
+func (c *Chip8) runCycle(f func(), cycle *time.Ticker) {
+	go func() {
+		for {
+			select {
+			case <-c.Stop:
+				cycle.Stop()
+				return
+			case <-cycle.C:
+				f()
+			}
+		}
+	}()
+}
 func (c *Chip8) subtract(target, x, y uint16) {
 	if c.v[x] > c.v[y] {
 		c.v[0xF] = 1

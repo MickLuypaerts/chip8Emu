@@ -26,7 +26,7 @@ type TUI struct {
 	termHeight int
 }
 
-type chip interface {
+type Chip interface {
 	GetGPRValues() []string
 	GetKeyValues() []string
 	GetStackValues() []string
@@ -36,7 +36,7 @@ type chip interface {
 	GetScreen() ([]byte, int, int)
 }
 
-func (t *TUI) Init(c chip) {
+func (t *TUI) Init(c Chip) {
 	t.initLGPR(c.GetGPRValues)
 	t.initLKeys(c.GetKeyValues)
 	t.initLStack(c.GetStackValues)
@@ -113,7 +113,7 @@ func (t *TUI) initTermSize() {
 	t.termWidth, t.termHeight = ui.TerminalDimensions()
 }
 
-func (t *TUI) SetEmuInfo(c chip) {
+func (t *TUI) SetEmuInfo(c Chip) {
 	t.lProgStats.Rows = c.GetProgStats()
 	t.lGPR.Rows = c.GetGPRValues()
 	t.LMem.Rows = c.GetMemoryValues()
@@ -122,7 +122,7 @@ func (t *TUI) SetEmuInfo(c chip) {
 	ui.Render(t.lProgStats, t.lGPR, t.LMem, t.lStack)
 }
 
-func (t *TUI) UpdateScreen(c chip) {
+func (t *TUI) UpdateScreen(c Chip) {
 	screenBuffer, width, height := c.GetScreen()
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
