@@ -135,3 +135,23 @@ func (t *TUI) UpdateScreen(c Chip) {
 	}
 	ui.Render(t.canvas)
 }
+
+func ScrollDown(l *widgets.List) {
+	l.ScrollDown()
+	ui.Render(l)
+}
+
+func ScrollUp(l *widgets.List) {
+	l.ScrollUp()
+	ui.Render(l)
+}
+
+func ScrollTop(l *widgets.List) {
+	l.ScrollTop()
+	ui.Render(l)
+}
+
+func ScrollBottom(l *widgets.List) {
+	l.ScrollBottom()
+	ui.Render(l)
+}

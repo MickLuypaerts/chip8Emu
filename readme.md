@@ -37,7 +37,6 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] Stepping Through the program
 [X] Running the program
 [ ] let user choose Hertz
-[ ] fix memory TUI controls
 
 [X] Print controls in usage
 

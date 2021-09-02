@@ -40,18 +40,18 @@ func main() {
 		case "q", "<C-c>":
 			return
 		case "j", "<Down>":
-			TUI.LMem.ScrollDown()
+			//TUI.LMem.ScrollDown()
+			view.ScrollDown(TUI.LMem)
 		case "k", "<Up>":
-			TUI.LMem.ScrollUp()
+			view.ScrollUp(TUI.LMem)
 		case "g":
 			if previousKey == "g" {
-				TUI.LMem.ScrollTop()
+				view.ScrollTop(TUI.LMem)
 			}
 		case "G", "<End>":
-			TUI.LMem.ScrollBottom()
+			view.ScrollBottom(TUI.LMem)
 		case "s":
 			chip8.EmulateCycle()
-			//TUI.SetEmuInfo(&chip8)
 		case "r":
 			// run program
 			chip8.Run()
@@ -65,6 +65,7 @@ func main() {
 		} else {
 			previousKey = e.ID
 		}
+
 	}
 }
 
