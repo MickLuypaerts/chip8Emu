@@ -53,12 +53,8 @@ func main() {
 		case "s":
 			chip8.EmulateCycle()
 		case "r":
-			// run program
 			chip8.Run()
 		case "R":
-			// stop program
-			// chip8.Stop <- true
-			// chip8.Stop <- true
 			chip8.Stop()
 		}
 
