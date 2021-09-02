@@ -57,7 +57,9 @@ func main() {
 			chip8.Run()
 		case "R":
 			// stop program
-			chip8.Stop <- true
+			// chip8.Stop <- true
+			// chip8.Stop <- true
+			chip8.Stop()
 		}
 
 		if previousKey == "g" {

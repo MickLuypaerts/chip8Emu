@@ -31,7 +31,7 @@ type Chip8 struct {
 	key        [keyNumbers]byte
 	delayTimer byte
 	soundTimer byte
-	Stop       chan bool
+	stop       chan bool
 
 	info       chip8Info
 	ScreenFunc func(view.Chip)
@@ -84,7 +84,7 @@ func (c *Chip8) Init(file string) error {
 	for i := range romData {
 		c.memory[i+512] = romData[i]
 	}
-	c.Stop = make(chan bool)
+	c.stop = make(chan bool)
 	return nil
 }
 
@@ -127,14 +127,18 @@ func (c *Chip8) Run() {
 
 	go c.runCycle(c.EmulateCycle, clock)
 	go c.runCycle(c.updateTimers, timers)
+}
 
+func (c *Chip8) Stop() {
+	c.stop <- true
+	c.stop <- true
 }
 
 func (c *Chip8) runCycle(f func(), cycle *time.Ticker) {
 	go func() {
 		for {
 			select {
-			case <-c.Stop:
+			case <-c.stop:
 				cycle.Stop()
 				return
 			case <-cycle.C:
