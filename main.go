@@ -55,6 +55,7 @@ func main() {
 	lMem.TextStyle = ui.NewStyle(ui.ColorYellow)
 	lMem.WrapText = false
 	lMem.Rows = chip8.GetMemoryValues()
+	lMem.SelectedRow = int(chip8.GetMemoryRow())
 
 	lProgStats := widgets.NewList()
 	lProgStats.Title = fmt.Sprintf("INFO %s", os.Args[1])
@@ -68,8 +69,8 @@ func main() {
 	grid.SetRect(0, 0, termWidth, termHeight)
 	grid.Set(
 		ui.NewRow(2.0/3,
-			ui.NewCol(3.0/4, c),          // TODO: program counter, ...
-			ui.NewCol(1.0/4, lProgStats), // TODO: Screen
+			ui.NewCol(3.0/4, c),
+			ui.NewCol(1.0/4, lProgStats),
 		),
 		ui.NewRow(1.0/3,
 			ui.NewCol(0.5/4, lGPR),
@@ -79,7 +80,6 @@ func main() {
 		),
 	)
 	ui.Render(grid)
-
 	previousKey := ""
 	uiEvents := ui.PollEvents()
 	for {
@@ -109,10 +109,14 @@ func main() {
 			lMem.ScrollBottom()
 		case "s":
 			chip8.EmulateCycle()
-			updateCanvas(c, chip8)
+			if chip8.DrawFlag {
+				updateCanvas(c, chip8)
+				chip8.DrawFlag = false
+			}
 			lProgStats.Rows = chip8.GetProgStats()
 			lGPR.Rows = chip8.GetGPRValues()
 			lMem.Rows = chip8.GetMemoryValues()
+			lMem.SelectedRow = int(chip8.GetMemoryRow())
 			lStack.Rows = chip8.GetStackValues()
 		}
 
