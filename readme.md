@@ -16,10 +16,27 @@ Delay timer: This timer is intended to be used for timing the events of games. I
 Sound timer: This timer is used for sound effects. When its value is nonzero, a beeping sound is made.
 
 
+
+# controls
+|key|function|
+|---|---|
+|q|quit|
+|s|1 cycle|
+|j|Mem map down|
+|k|Mem map up|
+|gg|Mem map top|
+|G|Mem map top|
+
+
 # TODO
 [X] Screen
 [ ] Input
 [ ] Sound
+[X] Stepping Through the program
+[ ] Running the program
+[ ] let user choose Hertz
+
+[X] Print controls in usage
 
 ## Opcodes
 [X] 0NNN  
@@ -57,6 +74,12 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] FX33  
 [X] FX55  
 [X] FX65  
+
+
+1 Ticker for the clock cycles => every tick chip8.EmulateCycle()
+non blocking channel for keyboard input => select + default
+blocking channel for keyboard opcode: FX0A
+
 
 
 # packages
