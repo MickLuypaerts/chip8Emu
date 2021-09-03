@@ -119,7 +119,13 @@ func (t *TUI) SetEmuInfo(c Chip) {
 	t.LMem.Rows = c.GetMemoryValues()
 	t.LMem.SelectedRow = int(c.GetMemoryRow())
 	t.lStack.Rows = c.GetStackValues()
+
 	ui.Render(t.lProgStats, t.lGPR, t.LMem, t.lStack)
+}
+
+func (t *TUI) SetKeyInfo(c Chip) {
+	t.lKeys.Rows = c.GetKeyValues()
+	ui.Render(t.lKeys)
 }
 
 func (t *TUI) UpdateScreen(c Chip) {
