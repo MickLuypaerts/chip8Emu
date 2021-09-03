@@ -54,8 +54,11 @@ func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
 	c.info.opcodeDesc = d
 }
 
-func (c *Chip8) Init(file string) error {
+func (c *Chip8) Init(file string, screenFunc func(view.Chip), infoFunc func(view.Chip), keyFunc func(view.Chip)) error {
 	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
+	c.ScreenFunc = screenFunc
+	c.InfoFunc = infoFunc
+	c.KeyFunc = keyFunc
 	romData, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err

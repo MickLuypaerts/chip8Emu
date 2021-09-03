@@ -16,7 +16,8 @@ func main() {
 		return
 	}
 	var chip8 chip8.Chip8
-	err := chip8.Init(os.Args[1])
+	var TUI view.TUI
+	err := chip8.Init(os.Args[1], TUI.UpdateScreen, TUI.SetEmuInfo, TUI.SetKeyInfo)
 	if err != nil {
 		log.Fatalf("failed to initialize chip8: %v", err)
 	}
@@ -27,14 +28,10 @@ func main() {
 	}
 	defer ui.Close()
 
-	var TUI view.TUI
 	TUI.Init(&chip8)
 	ui.Render(TUI.Grid)
 	previousKey := ""
 	uiEvents := ui.PollEvents()
-	chip8.ScreenFunc = TUI.UpdateScreen
-	chip8.InfoFunc = TUI.SetEmuInfo
-	chip8.KeyFunc = TUI.SetKeyInfo
 
 	for {
 		e := <-uiEvents
@@ -90,7 +87,7 @@ func sendKeyboardInterrupt(c chan byte, key byte, pKey string) {
 func usage() {
 	fmt.Printf("Usage: %s [FILE]\n", os.Args[0])
 	fmt.Printf("\n")
-	fmt.Printf("Controls:\n")
+	fmt.Printf("Emulator Controls:\n")
 	fmt.Printf("|key|  function  |\n")
 	fmt.Printf("|---|------------|\n")
 	fmt.Printf("| q |    quit    |\n")
