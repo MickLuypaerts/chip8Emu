@@ -58,29 +58,29 @@ func main() {
 		case "R":
 			chip8.Stop()
 		case "1":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x1, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x1)
 		case "2":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x2, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x2)
 		case "3":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x3, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x3)
 		case "4":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x4, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x4)
 		case "5":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x5, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x5)
 		case "6":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x6, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x6)
 		case "7":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x7, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x7)
 		case "8":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x8, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x8)
 		case "9":
-			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x9, previousKey)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x9)
 		}
 		previousKey = e.ID
 	}
 
 }
-func sendKeyboardInterrupt(c chan byte, key byte, pKey string) {
+func sendKeyboardInterrupt(c chan byte, key byte) {
 	c <- key
 }
 
