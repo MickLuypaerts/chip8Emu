@@ -84,9 +84,7 @@ func main() {
 
 }
 func sendKeyboardInterrupt(c chan byte, key byte, pKey string) {
-	//if pKey != fmt.Sprintf("%X", key) {
 	c <- key
-	//}
 }
 
 func usage() {

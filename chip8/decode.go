@@ -68,7 +68,6 @@ func (c *Chip8) decode() {
 		y := uint16(c.v[c.getYFromOpcode()])
 		h := uint16(c.getNFromOpcode())
 		c.draw(x, y, h)
-		// Dxyn
 	case 0xE000:
 		c.decode0xE000()
 
@@ -98,7 +97,7 @@ func (c *Chip8) decode0xF000() {
 	case 0x0007:
 		c.setOpcodeInfo("FX07", "Timer", "Sets VX to the value of the delay timer.")
 		c.v[c.getXFromOpcode()] = c.delayTimer
-	case 0x000A: // Fx0A
+	case 0x000A:
 		// FX0A  KeyOp  A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event);
 		c.pc -= 2
 	case 0x0015:
@@ -119,7 +118,7 @@ func (c *Chip8) decode0xF000() {
 			}
 			loc += 5
 		}
-	case 0x0033: // Fx33
+	case 0x0033:
 		c.setOpcodeInfo("FX33", "BCD", "Stores the binary-coded decimal representation of VX, with the most significant of three digits at the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2. (In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.);")
 		/*
 			Store BCD representation of Vx in I
@@ -200,7 +199,6 @@ func (c *Chip8) decode0x8000() {
 		c.v[index] <<= 1
 		c.vChanged[index] = true
 	case 0x0007:
-		// 8xy7
 		c.setOpcodeInfo("8XY7", "Math", "Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there is not.")
 		indexX := c.getXFromOpcode()
 		indexY := c.getYFromOpcode()
