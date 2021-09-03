@@ -32,7 +32,8 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 
 # TODO
 [X] Screen
-[ ] Input
+[X] Input
+[ ] Fix buggy input (reseting keyboard)
 [ ] Sound
 [X] Stepping Through the program
 [X] Running the program

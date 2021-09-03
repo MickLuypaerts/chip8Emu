@@ -7,31 +7,33 @@ import (
 )
 
 const (
-	memorySize     = 4096
-	vRegSize       = 16
-	stackSize      = 16
-	screenWidth    = 64
-	screenHeigth   = 32
-	keyNumbers     = 16
-	clockCycleRate = 2 * time.Microsecond
-	timeCycleRate  = 16 * time.Microsecond
+	memorySize        = 4096
+	vRegSize          = 16
+	stackSize         = 16
+	screenWidth       = 64
+	screenHeigth      = 32
+	keyNumbers        = 16
+	clockCycleRate    = 2 * time.Microsecond
+	timeCycleRate     = 16 * time.Microsecond
+	keyboardCycleRate = 8 * time.Millisecond
 )
 
 type Chip8 struct {
-	opcode     uint16
-	i          uint16 // The address register, which is named I, is 12 bits wide and is used with several opcodes that involve memory operations.
-	pc         uint16
-	stack      [stackSize]uint16
-	sp         byte
-	memory     [memorySize]byte
-	v          [vRegSize]byte // general purpose registers
-	vChanged   [vRegSize]bool
-	screenBuf  [screenWidth * screenHeigth]byte
-	drawFlag   bool
-	key        [keyNumbers]byte
-	delayTimer byte
-	soundTimer byte
-	stop       chan bool
+	opcode            uint16
+	i                 uint16 // The address register, which is named I, is 12 bits wide and is used with several opcodes that involve memory operations.
+	pc                uint16
+	stack             [stackSize]uint16
+	sp                byte
+	memory            [memorySize]byte
+	v                 [vRegSize]byte // general purpose registers
+	vChanged          [vRegSize]bool
+	screenBuf         [screenWidth * screenHeigth]byte
+	drawFlag          bool
+	key               [keyNumbers]byte
+	delayTimer        byte
+	soundTimer        byte
+	stop              chan bool
+	KeyBoardInterrupt chan byte
 
 	info       chip8Info
 	ScreenFunc func(view.Chip)
@@ -86,20 +88,42 @@ func (c *Chip8) Init(file string) error {
 		c.memory[i+512] = romData[i]
 	}
 	c.stop = make(chan bool)
+	c.KeyBoardInterrupt = make(chan byte)
 	return nil
 }
 
 func (c *Chip8) ClearKeys() {
+	clearedKey := false
 	for i := range c.key {
-		c.key[i] = 0
+		if c.key[i] != 0 {
+			c.key[i] = 0
+			clearedKey = true
+		}
 	}
+	if clearedKey {
+		c.KeyFunc(c)
+	}
+}
+
+func (c *Chip8) ClearKey(key byte) {
+	c.key[key] = 0
 	c.KeyFunc(c)
 }
 
 func (c *Chip8) PressKey(key byte) {
-	c.key[key] = 1
-	c.KeyFunc(c)
+	for i := range c.key {
+		if byte(i) == key {
+			if c.key[i] != 1 {
+				c.key[i] = 1
+			}
 
+		} else {
+			if c.key[i] != 0 {
+				c.key[i] = 0
+			}
+		}
+	}
+	c.KeyFunc(c)
 }
 
 func (c *Chip8) clearScreen() {
@@ -138,29 +162,58 @@ func (c *Chip8) EmulateCycle() {
 func (c *Chip8) Run() {
 	clock := time.NewTicker(clockCycleRate)
 	timers := time.NewTicker(timeCycleRate)
+	keyboard := time.NewTicker(keyboardCycleRate)
 
-	go c.runCycle(c.EmulateCycle, clock)
-	go c.runCycle(c.updateTimers, timers)
+	go c.runClockCycle(clock)
+	go c.runTimerCycle(timers)
+	go c.runKeyboardCycle(keyboard)
+}
+
+func (c *Chip8) runKeyboardCycle(keyboardTimer *time.Ticker) {
+	for {
+		select {
+		case <-c.stop:
+			keyboardTimer.Stop()
+			return
+		case <-keyboardTimer.C:
+			c.ClearKeys()
+		}
+	}
+}
+
+func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
+	for {
+		select {
+		case <-c.stop:
+			clockTimer.Stop()
+			return
+		case <-clockTimer.C:
+			c.EmulateCycle()
+
+		case k := <-c.KeyBoardInterrupt:
+			c.PressKey(k)
+		}
+	}
+}
+
+func (c *Chip8) runTimerCycle(timerTimer *time.Ticker) {
+	for {
+		select {
+		case <-c.stop:
+			timerTimer.Stop()
+			return
+		case <-timerTimer.C:
+			c.updateTimers()
+		}
+	}
 }
 
 func (c *Chip8) Stop() {
 	c.stop <- true
 	c.stop <- true
+	c.stop <- true
 }
 
-func (c *Chip8) runCycle(f func(), cycle *time.Ticker) {
-	go func() {
-		for {
-			select {
-			case <-c.stop:
-				cycle.Stop()
-				return
-			case <-cycle.C:
-				f()
-			}
-		}
-	}()
-}
 func (c *Chip8) subtract(target, x, y uint16) {
 	if c.v[x] > c.v[y] {
 		c.v[0xF] = 1

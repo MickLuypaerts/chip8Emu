@@ -37,62 +37,56 @@ func main() {
 	chip8.KeyFunc = TUI.SetKeyInfo
 
 	for {
-		chip8.ClearKeys()
 		e := <-uiEvents
-
 		switch e.ID {
 		case "q", "<C-c>":
+
 			return
 		case "j", "<Down>":
 			view.ScrollDown(TUI.LMem)
-			chip8.ClearKeys()
+
 		case "k", "<Up>":
 			view.ScrollUp(TUI.LMem)
-			chip8.ClearKeys()
 		case "g":
 			if previousKey == "g" {
 				view.ScrollTop(TUI.LMem)
+				previousKey = ""
 			}
 		case "G", "<End>":
 			view.ScrollBottom(TUI.LMem)
-			chip8.ClearKeys()
 		case "s":
 			chip8.EmulateCycle()
-			chip8.ClearKeys()
 		case "r":
 			chip8.Run()
-			chip8.ClearKeys()
 		case "R":
 			chip8.Stop()
-			chip8.ClearKeys()
 		case "1":
-			chip8.PressKey(0x1)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x1, previousKey)
 		case "2":
-			chip8.PressKey(0x2)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x2, previousKey)
 		case "3":
-			chip8.PressKey(0x3)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x3, previousKey)
 		case "4":
-			chip8.PressKey(0x4)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x4, previousKey)
 		case "5":
-			chip8.PressKey(0x5)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x5, previousKey)
 		case "6":
-			chip8.PressKey(0x6)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x6, previousKey)
 		case "7":
-			chip8.PressKey(0x7)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x7, previousKey)
 		case "8":
-			chip8.PressKey(0x8)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x8, previousKey)
 		case "9":
-			chip8.PressKey(0x9)
+			sendKeyboardInterrupt(chip8.KeyBoardInterrupt, 0x9, previousKey)
 		}
-
-		if previousKey == "g" {
-			previousKey = ""
-		} else {
-			previousKey = e.ID
-		}
-
+		previousKey = e.ID
 	}
 
+}
+func sendKeyboardInterrupt(c chan byte, key byte, pKey string) {
+	//if pKey != fmt.Sprintf("%X", key) {
+	c <- key
+	//}
 }
 
 func usage() {

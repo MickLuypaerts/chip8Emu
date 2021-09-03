@@ -1,7 +1,6 @@
 package chip8
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -256,17 +255,6 @@ func (c *Chip8) draw(x, y, h uint16) {
 	}
 	c.drawFlag = true
 	c.vChanged[0xF] = true
-	//c.printScreenToConsole()
-}
-
-func (c Chip8) printScreenToConsole() {
-	for y := 0; y < screenHeigth; y++ {
-		for x := 0; x < screenWidth; x++ {
-			fmt.Print(c.screenBuf[x+(y*screenWidth)])
-		}
-		fmt.Println()
-	}
-	fmt.Println()
 }
 
 func (c Chip8) getXFromOpcode() uint16 {
