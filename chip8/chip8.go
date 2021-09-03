@@ -36,6 +36,7 @@ type Chip8 struct {
 	info       chip8Info
 	ScreenFunc func(view.Chip)
 	InfoFunc   func(view.Chip)
+	KeyFunc    func(view.Chip)
 }
 
 type chip8Info struct {
@@ -86,6 +87,19 @@ func (c *Chip8) Init(file string) error {
 	}
 	c.stop = make(chan bool)
 	return nil
+}
+
+func (c *Chip8) ClearKeys() {
+	for i := range c.key {
+		c.key[i] = 0
+	}
+	c.KeyFunc(c)
+}
+
+func (c *Chip8) PressKey(key byte) {
+	c.key[key] = 1
+	c.KeyFunc(c)
+
 }
 
 func (c *Chip8) clearScreen() {

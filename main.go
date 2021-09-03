@@ -34,27 +34,55 @@ func main() {
 	uiEvents := ui.PollEvents()
 	chip8.ScreenFunc = TUI.UpdateScreen
 	chip8.InfoFunc = TUI.SetEmuInfo
+	chip8.KeyFunc = TUI.SetKeyInfo
+
 	for {
+		chip8.ClearKeys()
 		e := <-uiEvents
+
 		switch e.ID {
 		case "q", "<C-c>":
 			return
 		case "j", "<Down>":
 			view.ScrollDown(TUI.LMem)
+			chip8.ClearKeys()
 		case "k", "<Up>":
 			view.ScrollUp(TUI.LMem)
+			chip8.ClearKeys()
 		case "g":
 			if previousKey == "g" {
 				view.ScrollTop(TUI.LMem)
 			}
 		case "G", "<End>":
 			view.ScrollBottom(TUI.LMem)
+			chip8.ClearKeys()
 		case "s":
 			chip8.EmulateCycle()
+			chip8.ClearKeys()
 		case "r":
 			chip8.Run()
+			chip8.ClearKeys()
 		case "R":
 			chip8.Stop()
+			chip8.ClearKeys()
+		case "1":
+			chip8.PressKey(0x1)
+		case "2":
+			chip8.PressKey(0x2)
+		case "3":
+			chip8.PressKey(0x3)
+		case "4":
+			chip8.PressKey(0x4)
+		case "5":
+			chip8.PressKey(0x5)
+		case "6":
+			chip8.PressKey(0x6)
+		case "7":
+			chip8.PressKey(0x7)
+		case "8":
+			chip8.PressKey(0x8)
+		case "9":
+			chip8.PressKey(0x9)
 		}
 
 		if previousKey == "g" {
@@ -64,6 +92,7 @@ func main() {
 		}
 
 	}
+
 }
 
 func usage() {
