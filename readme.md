@@ -40,6 +40,7 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] Stepping Through the program  
 [X] Running the program  
 [ ] let user choose Hertz  
+[ ] Fix weird passing functions between Chip8 and TUI
 
 [X] Print controls in usage  
 
