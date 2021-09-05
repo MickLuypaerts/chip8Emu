@@ -45,10 +45,6 @@ func (c Chip8) GetScreenSize() (int, int) {
 	return screenWidth, screenHeigth
 }
 
-func (c Chip8) GetScreen() []byte {
-	return c.screenBuf[:]
-}
-
 func (c Chip8) OpcodeInfo() emulator.OpcodeInfo {
 	return c.info
 }

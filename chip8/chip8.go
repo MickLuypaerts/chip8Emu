@@ -143,7 +143,7 @@ func (c *Chip8) emulateCycle() {
 	c.decode()
 	c.updateTimers()
 	if c.drawFlag {
-		drawSignal <- c.GetScreen()
+		drawSignal <- c.screenBuf[:]
 		c.drawFlag = false
 	}
 	c.SetEmuInfo(c)
