@@ -81,7 +81,6 @@ func (t *TUI) initLMem(c Chip) {
 	t.lMem.TextStyle = ui.NewStyle(ui.ColorYellow)
 	t.lMem.WrapText = false
 
-	// t.lMem.Rows = c.GetMemoryValues()
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
 	t.SetListMemRow(c.GetProgStats())
 }
@@ -142,7 +141,6 @@ func (t *TUI) initTermSize() {
 func (t *TUI) SetEmuInfo(c Chip) {
 	t.lProgStats.Rows = []string{fmt.Sprint(c.GetProgStats())}
 	t.lGPR.Rows = c.GetGPRValues()
-	// t.lMem.Rows = c.GetMemoryValues()
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
 	t.SetListMemRow(c.GetProgStats())
 	t.lStack.Rows = c.GetStackValues()
