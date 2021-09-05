@@ -27,8 +27,7 @@ func (c Chip8) ControlsMap() map[string]emulator.Control {
 }
 
 func sendKeyboardInterrupt(c chan byte, key byte) {
-	select {
-	case c <- key:
-	default:
+	if running {
+		c <- key
 	}
 }

@@ -22,6 +22,7 @@ var (
 	keyBoardInterrupt = make(chan byte)
 	stopSignal        = make(chan struct{})
 	drawSignal        = make(chan []byte)
+	running           = false
 )
 
 type Chip8 struct {
@@ -39,7 +40,6 @@ type Chip8 struct {
 	key          [keyNumbers]byte
 	delayTimer   byte
 	soundTimer   byte
-	running      bool
 
 	info       emulator.OpcodeInfo
 	SetEmuInfo func(emulator.ChipGetter)
@@ -159,7 +159,7 @@ func (c *Chip8) run() {
 	clock := time.NewTicker(clockCycleRate)
 	timers := time.NewTicker(timeCycleRate)
 	keyboard := time.NewTicker(keyboardCycleRate)
-	c.running = true
+	running = true
 
 	go c.runClockCycle(clock)
 	go c.runTimerCycle(timers)
@@ -206,9 +206,9 @@ func (c *Chip8) runTimerCycle(timerTimer *time.Ticker) {
 }
 
 func (c *Chip8) stop() {
-	if c.running {
+	if running {
 		close(stopSignal)
-		c.running = false
+		running = false
 	}
 }
 
