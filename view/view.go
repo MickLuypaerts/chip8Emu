@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"os"
+	"sync"
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
@@ -14,6 +15,10 @@ const (
 	xOffSet       = 2
 	yOffSet       = 4
 	lMemRowLength = 16
+)
+
+var (
+	renderMu sync.Mutex
 )
 
 type TUI struct {
@@ -30,7 +35,7 @@ type TUI struct {
 	termHeight   int
 }
 
-func (t *TUI) Init(c emulator.Chip) {
+func (t *TUI) Init(drawSignal <-chan []byte, c emulator.Chip) {
 	t.initLGPR(c.GetGPRValues)
 	t.initLKeys(c.GetKeyValues)
 	t.initLStack(c.GetStackValues)
@@ -40,6 +45,14 @@ func (t *TUI) Init(c emulator.Chip) {
 	t.initTermSize()
 	t.screenWidth, t.screenHeight = c.GetScreenSize()
 	t.initGrid()
+	go func() {
+		for {
+			screen := <-drawSignal
+			if screen != nil {
+				t.updateScreen(screen)
+			}
+		}
+	}()
 }
 
 func (t *TUI) initLGPR(getGPRValues func() []string) {
@@ -138,7 +151,7 @@ func (t *TUI) SetEmuInfo(c emulator.ChipGetter) {
 	t.SetListMemRow(c.OpcodeInfo())
 	t.lStack.Rows = c.GetStackValues()
 
-	ui.Render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
+	render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
 }
 
 func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
@@ -150,16 +163,15 @@ func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
 	} else {
 		t.lMem.SelectedRow = row
 	}
-	ui.Render(t.lMem)
+	render(t.lMem)
 }
 
 func (t *TUI) SetKeyInfo(c emulator.ChipGetter) {
 	t.lKeys.Rows = c.GetKeyValues()
-	ui.Render(t.lKeys)
+	render(t.lKeys)
 }
 
-func (t *TUI) UpdateScreen(c emulator.ChipGetter) {
-	screenBuffer := c.GetScreen()
+func (t *TUI) updateScreen(screenBuffer []byte) {
 	for y := 0; y < t.screenHeight; y++ {
 		for x := 0; x < t.screenWidth; x++ {
 			if screenBuffer[x+(y*t.screenWidth)] != 0 {
@@ -169,27 +181,27 @@ func (t *TUI) UpdateScreen(c emulator.ChipGetter) {
 			}
 		}
 	}
-	ui.Render(t.canvas)
+	render(t.canvas)
 }
 
 func scrollDown(l *widgets.List) {
 	l.ScrollDown()
-	ui.Render(l)
+	render(l)
 }
 
 func scrollUp(l *widgets.List) {
 	l.ScrollUp()
-	ui.Render(l)
+	render(l)
 }
 
 func scrollTop(l *widgets.List) {
 	l.ScrollTop()
-	ui.Render(l)
+	render(l)
 }
 
 func scrollBottom(l *widgets.List) {
 	l.ScrollBottom()
-	ui.Render(l)
+	render(l)
 }
 
 func (t TUI) Close() {
@@ -197,7 +209,7 @@ func (t TUI) Close() {
 }
 
 func (t TUI) Render() {
-	ui.Render(t.grid)
+	render(t.grid)
 }
 
 func (t TUI) Setup() error {
@@ -217,4 +229,10 @@ func (t TUI) KeyEvent() <-chan string {
 		}
 	}()
 	return ch
+}
+
+func render(items ...ui.Drawable) {
+	renderMu.Lock()
+	ui.Render(items...)
+	renderMu.Unlock()
 }

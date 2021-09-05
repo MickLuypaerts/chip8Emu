@@ -21,6 +21,7 @@ const (
 var (
 	keyBoardInterrupt = make(chan byte)
 	stopSignal        = make(chan struct{})
+	drawSignal        = make(chan []byte)
 )
 
 type Chip8 struct {
@@ -40,10 +41,9 @@ type Chip8 struct {
 	soundTimer   byte
 	running      bool
 
-	info         emulator.OpcodeInfo
-	UpdateScreen func(emulator.ChipGetter)
-	SetEmuInfo   func(emulator.ChipGetter)
-	SetKeyInfo   func(emulator.ChipGetter)
+	info       emulator.OpcodeInfo
+	SetEmuInfo func(emulator.ChipGetter)
+	SetKeyInfo func(emulator.ChipGetter)
 }
 
 func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
@@ -51,8 +51,7 @@ func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
 }
 
 func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
-	c.pc = 0x200                      // programs written for the original system begin at memory location 512 (0x200)
-	c.UpdateScreen = tui.UpdateScreen // TODO: drawSingal so we can remove this weird function passing
+	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
 	c.SetEmuInfo = tui.SetEmuInfo
 	c.SetKeyInfo = tui.SetKeyInfo
 	romData, err := ioutil.ReadFile(file)
@@ -145,10 +144,14 @@ func (c *Chip8) emulateCycle() {
 	c.decode()
 	c.updateTimers()
 	if c.drawFlag {
-		c.UpdateScreen(c)
+		drawSignal <- c.GetScreen()
 		c.drawFlag = false
 	}
-	c.SetEmuInfo(c)
+	c.SetEmuInfo(c) // crash maybe happening because we call ui.render at the twice at the same time
+}
+
+func (c Chip8) DrawSignal() <-chan []byte {
+	return drawSignal
 }
 
 func (c *Chip8) run() {
