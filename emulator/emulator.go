@@ -5,24 +5,39 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+
+	ui "github.com/gizak/termui/v3"
 )
 
 type Chip interface {
 	ChipIniter
+
+	GetKeyValues() []string
+	GetStackValues() []string
+
+	GetScreen() []byte
+	GetScreenSize() (int, int)
+	GetGPRValues() []string
 	OpcodeInfo() OpcodeInfo
+	GetMemoryValues() []byte
 }
 
 type ChipIniter interface {
-	Init(file string) error
+	Init(file string, screenFunc func(Chip), infoFunc func(Chip), keyFunc func(Chip)) error
 	ControlsMap() map[string]Control
 }
 
 type TUI interface {
 	TUIIniter
+
+	Grid() *ui.Grid
+	UpdateScreen(c Chip)
+	SetEmuInfo(c Chip)
+	SetKeyInfo(c Chip)
 }
 
 type TUIIniter interface {
-	Init() error
+	Init(c Chip)
 	ControlsMap() map[string]Control
 }
 
@@ -36,11 +51,19 @@ type Emulator struct {
 }
 
 func (emu *Emulator) Run() {
+	defer ui.Close()
+	ui.Render(emu.tui.Grid())
+
 	go func() {
 		<-emu.quit
 		ClearTerminal()
 		os.Exit(0)
 	}()
+	uiEvents := ui.PollEvents()
+	for {
+		e := <-uiEvents
+		ExecuteKeyFunction(emu.controls, e.ID)
+	}
 }
 
 func usage(name string, c map[string]Control, t map[string]Control) {
@@ -55,16 +78,17 @@ func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, er
 		usage(args[0], c.ControlsMap(), t.ControlsMap())
 		os.Exit(0)
 	}
+	if err := ui.Init(); err != nil {
+		return nil, err
+	}
 	e.chip = c
-	err := e.chip.Init(args[1])
+	err := e.chip.Init(args[1], t.UpdateScreen, t.SetEmuInfo, t.SetKeyInfo)
 	if err != nil {
 		return nil, err
 	}
 	e.tui = t
-	err = e.tui.Init()
-	if err != nil {
-		return nil, err
-	}
+	e.tui.Init(e.chip)
+
 	e.controls, err = CreateKeyFuncMap(c.ControlsMap(), t.ControlsMap(), quitKey, e.quit)
 	if err != nil {
 		return nil, err

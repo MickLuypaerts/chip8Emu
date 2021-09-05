@@ -7,45 +7,16 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	ui "github.com/gizak/termui/v3"
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		usage()
-		return
-	}
-	var chip8 chip8.Chip8
-	var TUI view.TUI
-	err := chip8.Init(os.Args[1], TUI.UpdateScreen, TUI.SetEmuInfo, TUI.SetKeyInfo)
+	chip := new(chip8.Chip8)
+	tui := new(view.TUI)
+	emu, err := emulator.CreateEmulator(os.Args, "q", chip, tui)
 	if err != nil {
-		log.Fatalf("failed to initialize chip8: %v", err)
+		log.Fatal(err)
 	}
-
-	// TUI
-	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
-	}
-	defer ui.Close()
-
-	TUI.Init(&chip8)
-	ui.Render(TUI.Grid)
-	uiEvents := ui.PollEvents()
-	quit := make(chan struct{})
-	controls, err := emulator.CreateKeyFuncMap(chip8.ControlsMap(), TUI.GetControlsMap(), "q", quit)
-	if err != nil {
-		log.Fatalf("failed to create controls: %v", err)
-	}
-	go func() {
-		<-quit
-		emulator.ClearTerminal()
-		os.Exit(0)
-	}()
-	for {
-		e := <-uiEvents
-		emulator.ExecuteKeyFunction(controls, e.ID)
-	}
+	emu.Run()
 
 }
 func usage() {

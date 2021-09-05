@@ -25,23 +25,12 @@ type TUI struct {
 	canvas       *ui.Canvas
 	screenWidth  int
 	screenHeight int
-	Grid         *ui.Grid
+	grid         *ui.Grid
 	termWidth    int
 	termHeight   int
 }
 
-type Chip interface {
-	GetKeyValues() []string
-	GetStackValues() []string
-
-	GetScreen() []byte
-	GetScreenSize() (int, int)
-	GetGPRValues() []string
-	OpcodeInfo() emulator.OpcodeInfo
-	GetMemoryValues() []byte
-}
-
-func (t *TUI) Init(c Chip) {
+func (t *TUI) Init(c emulator.Chip) {
 	t.initLGPR(c.GetGPRValues)
 	t.initLKeys(c.GetKeyValues)
 	t.initLStack(c.GetStackValues)
@@ -79,7 +68,7 @@ func (t *TUI) initLStack(getStackValues func() []string) {
 	t.lStack.WrapText = false
 	t.lStack.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
-func (t *TUI) initLMem(c Chip) {
+func (t *TUI) initLMem(c emulator.Chip) {
 	t.lMem = widgets.NewList()
 	t.lMem.Title = "Memory"
 	t.lMem.TextStyle = ui.NewStyle(ui.ColorYellow)
@@ -121,9 +110,9 @@ func (t *TUI) initCanvas() {
 }
 
 func (t *TUI) initGrid() {
-	t.Grid = ui.NewGrid()
-	t.Grid.SetRect(0, 0, t.termWidth, t.termHeight)
-	t.Grid.Set(
+	t.grid = ui.NewGrid()
+	t.grid.SetRect(0, 0, t.termWidth, t.termHeight)
+	t.grid.Set(
 		ui.NewRow(2.0/3,
 			ui.NewCol(3.0/4, t.canvas),
 			ui.NewCol(1.0/4, t.lProgStats),
@@ -142,7 +131,11 @@ func (t *TUI) initTermSize() {
 	t.termWidth, t.termHeight = ui.TerminalDimensions()
 }
 
-func (t *TUI) SetEmuInfo(c Chip) {
+func (t TUI) Grid() *ui.Grid {
+	return t.grid
+}
+
+func (t *TUI) SetEmuInfo(c emulator.Chip) {
 	t.lProgStats.Rows = []string{fmt.Sprint(c.OpcodeInfo())}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
@@ -164,12 +157,12 @@ func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
 	ui.Render(t.lMem)
 }
 
-func (t *TUI) SetKeyInfo(c Chip) {
+func (t *TUI) SetKeyInfo(c emulator.Chip) {
 	t.lKeys.Rows = c.GetKeyValues()
 	ui.Render(t.lKeys)
 }
 
-func (t *TUI) UpdateScreen(c Chip) {
+func (t *TUI) UpdateScreen(c emulator.Chip) {
 	screenBuffer := c.GetScreen()
 	for y := 0; y < t.screenHeight; y++ {
 		for x := 0; x < t.screenWidth; x++ {

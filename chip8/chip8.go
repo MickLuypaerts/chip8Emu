@@ -2,7 +2,6 @@ package chip8
 
 import (
 	"chip8/emulator"
-	"chip8/view"
 	"io/ioutil"
 	"time"
 )
@@ -38,16 +37,16 @@ type Chip8 struct {
 	keyBoardInterrupt chan byte
 
 	info       emulator.OpcodeInfo
-	ScreenFunc func(view.Chip)
-	InfoFunc   func(view.Chip)
-	KeyFunc    func(view.Chip)
+	ScreenFunc func(emulator.Chip)
+	InfoFunc   func(emulator.Chip)
+	KeyFunc    func(emulator.Chip)
 }
 
 func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
 	c.info = emulator.CreateOpcodeInfo(c.opcode, n, t, d, c.pc)
 }
 
-func (c *Chip8) Init(file string, screenFunc func(view.Chip), infoFunc func(view.Chip), keyFunc func(view.Chip)) error {
+func (c *Chip8) Init(file string, screenFunc func(emulator.Chip), infoFunc func(emulator.Chip), keyFunc func(emulator.Chip)) error {
 	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
 	c.ScreenFunc = screenFunc
 	c.InfoFunc = infoFunc

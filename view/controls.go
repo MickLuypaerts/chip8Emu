@@ -2,7 +2,7 @@ package view
 
 import "chip8/emulator"
 
-func (t TUI) GetControlsMap() map[string]emulator.Control {
+func (t TUI) ControlsMap() map[string]emulator.Control {
 	m := make(map[string]emulator.Control)
 	m["j"] = emulator.NewControl(func() { scrollDown(t.lMem) }, "Mem map down")
 	m["<Down>"] = emulator.NewControl(func() { scrollDown(t.lMem) }, "Mem map down")
