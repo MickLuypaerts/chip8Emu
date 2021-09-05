@@ -57,13 +57,13 @@ func (emu *Emulator) Run() {
 
 	go func() {
 		<-emu.quit
-		ClearTerminal()
+		clearTerminal()
 		os.Exit(0)
 	}()
 	uiEvents := ui.PollEvents()
 	for {
 		e := <-uiEvents
-		ExecuteKeyFunction(emu.controls, e.ID)
+		executeKeyFunction(emu.controls, e.ID)
 	}
 }
 
@@ -103,15 +103,14 @@ func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, er
 	e.tui = t
 	e.tui.Init(e.chip)
 
-	e.controls, err = CreateKeyFuncMap(c.ControlsMap(), t.ControlsMap(), quitKey, e.quit)
+	e.controls, err = createKeyFuncMap(c.ControlsMap(), t.ControlsMap(), quitKey, e.quit)
 	if err != nil {
 		return nil, err
 	}
 	return e, nil
 }
 
-// TODO: make private
-func CreateKeyFuncMap(chip map[string]Control, tui map[string]Control, quitKey string, quitChan chan struct{}) (map[string]func(), error) {
+func createKeyFuncMap(chip map[string]Control, tui map[string]Control, quitKey string, quitChan chan struct{}) (map[string]func(), error) {
 	c := make(map[string]func())
 	for k, v := range chip {
 		if _, ok := c[k]; !ok {
@@ -133,15 +132,13 @@ func CreateKeyFuncMap(chip map[string]Control, tui map[string]Control, quitKey s
 	return c, nil
 }
 
-// TODO: make private
-func ExecuteKeyFunction(m map[string]func(), k string) {
+func executeKeyFunction(m map[string]func(), k string) {
 	if f, ok := m[k]; ok {
 		f()
 	}
 }
 
-// TODO: make private
-func ClearTerminal() {
+func clearTerminal() {
 	if runtime.GOOS == "windows" {
 		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
 		cmd.Stdout = os.Stdout
