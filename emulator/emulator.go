@@ -144,11 +144,11 @@ func executeKeyFunction(m map[string]func(), k string) {
 
 func clearTerminal() {
 	if runtime.GOOS == "windows" {
-		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+		cmd := exec.Command("cmd", "/c", "cls")
 		cmd.Stdout = os.Stdout
 		cmd.Run()
 	} else if runtime.GOOS == "linux" {
-		cmd := exec.Command("clear") //Linux example, its tested
+		cmd := exec.Command("clear")
 		cmd.Stdout = os.Stdout
 		cmd.Run()
 	} else {
