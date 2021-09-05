@@ -18,7 +18,7 @@ type TUI struct {
 	lGPR       *widgets.List
 	lKeys      *widgets.List
 	lStack     *widgets.List
-	LMem       *widgets.List
+	lMem       *widgets.List
 	lProgStats *widgets.List
 	canvas     *ui.Canvas
 	Grid       *ui.Grid
@@ -74,12 +74,12 @@ func (t *TUI) initLStack(getStackValues func() []string) {
 	t.lStack.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
 func (t *TUI) initLMem(getMemoryValues func() []string, getMemoryRow func() uint16) {
-	t.LMem = widgets.NewList()
-	t.LMem.Title = "Memory"
-	t.LMem.TextStyle = ui.NewStyle(ui.ColorYellow)
-	t.LMem.WrapText = false
-	t.LMem.Rows = getMemoryValues()
-	t.LMem.SelectedRow = int(getMemoryRow())
+	t.lMem = widgets.NewList()
+	t.lMem.Title = "Memory"
+	t.lMem.TextStyle = ui.NewStyle(ui.ColorYellow)
+	t.lMem.WrapText = false
+	t.lMem.Rows = getMemoryValues()
+	t.lMem.SelectedRow = int(getMemoryRow())
 }
 func (t *TUI) initLProgStats(getProgStats func() []string) {
 	t.lProgStats = widgets.NewList()
@@ -103,7 +103,7 @@ func (t *TUI) initGrid() {
 			ui.NewCol(0.5/4, t.lGPR),
 			ui.NewCol(0.5/4, t.lStack),
 			ui.NewCol(0.5/4, t.lKeys),
-			ui.NewCol(2.5/4, t.LMem),
+			ui.NewCol(2.5/4, t.lMem),
 		),
 	)
 
@@ -116,11 +116,11 @@ func (t *TUI) initTermSize() {
 func (t *TUI) SetEmuInfo(c Chip) {
 	t.lProgStats.Rows = c.GetProgStats()
 	t.lGPR.Rows = c.GetGPRValues()
-	t.LMem.Rows = c.GetMemoryValues()
-	t.LMem.SelectedRow = int(c.GetMemoryRow())
+	t.lMem.Rows = c.GetMemoryValues()
+	t.lMem.SelectedRow = int(c.GetMemoryRow())
 	t.lStack.Rows = c.GetStackValues()
 
-	ui.Render(t.lProgStats, t.lGPR, t.LMem, t.lStack)
+	ui.Render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
 }
 
 func (t *TUI) SetKeyInfo(c Chip) {
@@ -142,22 +142,22 @@ func (t *TUI) UpdateScreen(c Chip) {
 	ui.Render(t.canvas)
 }
 
-func ScrollDown(l *widgets.List) {
+func scrollDown(l *widgets.List) {
 	l.ScrollDown()
 	ui.Render(l)
 }
 
-func ScrollUp(l *widgets.List) {
+func scrollUp(l *widgets.List) {
 	l.ScrollUp()
 	ui.Render(l)
 }
 
-func ScrollTop(l *widgets.List) {
+func scrollTop(l *widgets.List) {
 	l.ScrollTop()
 	ui.Render(l)
 }
 
-func ScrollBottom(l *widgets.List) {
+func scrollBottom(l *widgets.List) {
 	l.ScrollBottom()
 	ui.Render(l)
 }

@@ -4,6 +4,7 @@ import "os"
 
 type Chip interface {
 	ChipIniter
+	OpcodeInfo() OpcodeInfo
 }
 
 type ChipIniter interface {
@@ -26,6 +27,14 @@ type Emulator struct {
 	controls map[string]func()
 }
 
+func (emu *Emulator) Run() {
+
+}
+
+func usage(name string, c map[string]Control, t map[string]Control) {
+	// TODO: usage()
+}
+
 func CreateEmulator(args []string, c Chip, t TUI) (*Emulator, error) {
 	e := new(Emulator)
 	if len(args) < 2 {
@@ -42,18 +51,15 @@ func CreateEmulator(args []string, c Chip, t TUI) (*Emulator, error) {
 	if err != nil {
 		return nil, err
 	}
-	e.controls, err = createKeyFuncMap(c.ControlsMap(), t.ControlsMap())
+	e.controls, err = CreateKeyFuncMap(c.ControlsMap(), t.ControlsMap())
 	if err != nil {
 		return nil, err
 	}
 	return e, nil
 }
 
-func usage(name string, c map[string]Control, t map[string]Control) {
-	// TODO: usage()
-}
-
-func createKeyFuncMap(chip map[string]Control, tui map[string]Control) (map[string]func(), error) {
+// TODO: make private
+func CreateKeyFuncMap(chip map[string]Control, tui map[string]Control) (map[string]func(), error) {
 	c := make(map[string]func())
 	for k, v := range chip {
 		if _, ok := c[k]; !ok {
@@ -70,4 +76,11 @@ func createKeyFuncMap(chip map[string]Control, tui map[string]Control) (map[stri
 		}
 	}
 	return c, nil
+}
+
+// TODO: make private
+func ExecuteKeyFunction(m map[string]func(), k string) {
+	if f, ok := m[k]; ok {
+		f()
+	}
 }

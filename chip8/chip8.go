@@ -32,8 +32,8 @@ type Chip8 struct {
 	key               [keyNumbers]byte
 	delayTimer        byte
 	soundTimer        byte
-	stop              chan bool
-	KeyBoardInterrupt chan byte
+	stopSignal        chan bool
+	keyBoardInterrupt chan byte
 
 	info       chip8Info
 	ScreenFunc func(view.Chip)
@@ -90,8 +90,8 @@ func (c *Chip8) Init(file string, screenFunc func(view.Chip), infoFunc func(view
 	for i := range romData {
 		c.memory[i+512] = romData[i]
 	}
-	c.stop = make(chan bool)
-	c.KeyBoardInterrupt = make(chan byte)
+	c.stopSignal = make(chan bool)
+	c.keyBoardInterrupt = make(chan byte)
 	return nil
 }
 
@@ -151,7 +151,7 @@ func (c *Chip8) updateTimers() {
 	}
 }
 
-func (c *Chip8) EmulateCycle() {
+func (c *Chip8) emulateCycle() {
 	c.fetch()
 	c.decode()
 	c.updateTimers()
@@ -162,7 +162,7 @@ func (c *Chip8) EmulateCycle() {
 	c.InfoFunc(c)
 }
 
-func (c *Chip8) Run() {
+func (c *Chip8) run() {
 	clock := time.NewTicker(clockCycleRate)
 	timers := time.NewTicker(timeCycleRate)
 	keyboard := time.NewTicker(keyboardCycleRate)
@@ -175,7 +175,7 @@ func (c *Chip8) Run() {
 func (c *Chip8) runKeyboardCycle(keyboardTimer *time.Ticker) {
 	for {
 		select {
-		case <-c.stop:
+		case <-c.stopSignal:
 			keyboardTimer.Stop()
 			return
 		case <-keyboardTimer.C:
@@ -187,13 +187,13 @@ func (c *Chip8) runKeyboardCycle(keyboardTimer *time.Ticker) {
 func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 	for {
 		select {
-		case <-c.stop:
+		case <-c.stopSignal:
 			clockTimer.Stop()
 			return
 		case <-clockTimer.C:
-			c.EmulateCycle()
+			c.emulateCycle()
 
-		case k := <-c.KeyBoardInterrupt:
+		case k := <-c.keyBoardInterrupt:
 			c.PressKey(k)
 		}
 	}
@@ -202,7 +202,7 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 func (c *Chip8) runTimerCycle(timerTimer *time.Ticker) {
 	for {
 		select {
-		case <-c.stop:
+		case <-c.stopSignal:
 			timerTimer.Stop()
 			return
 		case <-timerTimer.C:
@@ -211,10 +211,10 @@ func (c *Chip8) runTimerCycle(timerTimer *time.Ticker) {
 	}
 }
 
-func (c *Chip8) Stop() {
-	c.stop <- true
-	c.stop <- true
-	c.stop <- true
+func (c *Chip8) stop() {
+	c.stopSignal <- true
+	c.stopSignal <- true
+	c.stopSignal <- true
 }
 
 func (c *Chip8) subtract(target, x, y uint16) {
