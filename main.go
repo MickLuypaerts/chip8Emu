@@ -16,5 +16,4 @@ func main() {
 		log.Fatal(err)
 	}
 	emu.Run()
-
 }

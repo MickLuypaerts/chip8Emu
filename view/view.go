@@ -131,10 +131,6 @@ func (t *TUI) initTermSize() {
 	t.termWidth, t.termHeight = ui.TerminalDimensions()
 }
 
-func (t TUI) Grid() *ui.Grid {
-	return t.grid
-}
-
 func (t *TUI) SetEmuInfo(c emulator.Chip) {
 	t.lProgStats.Rows = []string{fmt.Sprint(c.OpcodeInfo())}
 	t.lGPR.Rows = c.GetGPRValues()
@@ -194,4 +190,31 @@ func scrollTop(l *widgets.List) {
 func scrollBottom(l *widgets.List) {
 	l.ScrollBottom()
 	ui.Render(l)
+}
+
+func (t TUI) Close() {
+	ui.Close()
+}
+
+func (t TUI) Render() {
+	ui.Render(t.grid)
+}
+
+func (t TUI) Setup() error {
+	if err := ui.Init(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t TUI) KeyEvent() <-chan string {
+	ch := make(chan string)
+	keyEvents := ui.PollEvents()
+	go func() {
+		for {
+			key := <-keyEvents
+			ch <- key.ID
+		}
+	}()
+	return ch
 }
