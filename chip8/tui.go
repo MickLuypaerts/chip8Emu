@@ -72,9 +72,9 @@ func (c Chip8) GetScreen() ([]byte, int, int) {
 func (c Chip8) GetProgStats() []string {
 	progStats := []string{
 		fmt.Sprintf("OPCODE: 0x%04X", c.opcode),
-		fmt.Sprintf("Name:     %s", c.info.opcodeName),
-		fmt.Sprintf("Type: %s", c.info.opcodeType),
-		fmt.Sprintf("Desc: %s", c.info.opcodeDesc),
+		fmt.Sprintf("Name:     %s", c.info.OpcodeName()),
+		fmt.Sprintf("Type: %s", c.info.OpcodeType()),
+		fmt.Sprintf("Desc: %s", c.info.OpcodeDesc()),
 		fmt.Sprintf("PC: %d", c.pc),
 	}
 	return progStats
