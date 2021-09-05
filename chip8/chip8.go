@@ -7,15 +7,14 @@ import (
 )
 
 const (
-	memorySize        = 4096
-	vRegSize          = 16
-	stackSize         = 16
-	screenWidth       = 64
-	screenHeigth      = 32
-	keyNumbers        = 16
-	clockCycleRate    = 2 * time.Microsecond
-	timeCycleRate     = 16 * time.Microsecond
-	keyboardCycleRate = 8 * time.Millisecond
+	memorySize     = 4096
+	vRegSize       = 16
+	stackSize      = 16
+	screenWidth    = 64
+	screenHeigth   = 32
+	keyNumbers     = 16
+	clockCycleRate = 2 * time.Microsecond
+	timeCycleRate  = 16 * time.Microsecond
 )
 
 var (
@@ -158,24 +157,10 @@ func (c *Chip8) run() {
 	stopSignal = make(chan struct{})
 	clock := time.NewTicker(clockCycleRate)
 	timers := time.NewTicker(timeCycleRate)
-	keyboard := time.NewTicker(keyboardCycleRate)
 	running = true
 
 	go c.runClockCycle(clock)
 	go c.runTimerCycle(timers)
-	go c.runKeyboardCycle(keyboard)
-}
-
-func (c *Chip8) runKeyboardCycle(keyboardTimer *time.Ticker) {
-	for {
-		select {
-		case <-stopSignal:
-			keyboardTimer.Stop()
-			return
-		case <-keyboardTimer.C:
-			c.clearKeys()
-		}
-	}
 }
 
 func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
@@ -189,6 +174,8 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 
 		case k := <-keyBoardInterrupt:
 			c.pressKey(k)
+		default:
+			c.clearKeys()
 		}
 	}
 }
