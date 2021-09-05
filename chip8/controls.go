@@ -4,21 +4,21 @@ import "chip8/emulator"
 
 func (c Chip8) ControlsMap() map[string]emulator.Control {
 	m := make(map[string]emulator.Control)
-	m["1"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x1) }, "")
-	m["2"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x2) }, "")
-	m["3"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x3) }, "")
-	m["4"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x4) }, "")
-	m["5"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x5) }, "")
-	m["6"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x6) }, "")
-	m["7"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x7) }, "")
-	m["8"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x8) }, "")
-	m["9"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0x9) }, "")
-	m["A"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0xA) }, "")
-	m["B"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0xB) }, "")
-	m["C"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0xC) }, "")
-	m["D"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0xD) }, "")
-	m["E"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0xE) }, "")
-	m["F"] = emulator.NewControl(func() { sendKeyboardInterrupt(c.keyBoardInterrupt, 0xF) }, "")
+	m["1"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x1) }, "")
+	m["2"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x2) }, "")
+	m["3"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x3) }, "")
+	m["4"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x4) }, "")
+	m["5"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x5) }, "")
+	m["6"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x6) }, "")
+	m["7"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x7) }, "")
+	m["8"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x8) }, "")
+	m["9"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0x9) }, "")
+	m["A"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0xA) }, "")
+	m["B"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0xB) }, "")
+	m["C"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0xC) }, "")
+	m["D"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0xD) }, "")
+	m["E"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0xE) }, "")
+	m["F"] = emulator.NewControl(func() { sendKeyboardInterrupt(keyBoardInterrupt, 0xF) }, "")
 
 	m["r"] = emulator.NewControl(c.run, "run rom")
 	m["R"] = emulator.NewControl(c.stop, "stop rom")
@@ -27,5 +27,8 @@ func (c Chip8) ControlsMap() map[string]emulator.Control {
 }
 
 func sendKeyboardInterrupt(c chan byte, key byte) {
-	c <- key
+	select {
+	case c <- key:
+	default:
+	}
 }

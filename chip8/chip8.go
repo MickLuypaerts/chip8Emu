@@ -18,23 +18,26 @@ const (
 	keyboardCycleRate = 8 * time.Millisecond
 )
 
+var (
+	keyBoardInterrupt = make(chan byte)
+)
+
 type Chip8 struct {
-	opcode            uint16
-	i                 uint16 // The address register, which is named I, is 12 bits wide and is used with several opcodes that involve memory operations.
-	pc                uint16
-	stack             [stackSize]uint16
-	sp                byte
-	memory            [memorySize]byte
-	v                 [vRegSize]byte // general purpose registers
-	vChanged          [vRegSize]bool
-	screenBuf         [screenWidth * screenHeigth]byte
-	drawFlag          bool
-	playingSound      bool
-	key               [keyNumbers]byte
-	delayTimer        byte
-	soundTimer        byte
-	stopSignal        chan bool
-	keyBoardInterrupt chan byte
+	opcode       uint16
+	i            uint16 // The address register, which is named I, is 12 bits wide and is used with several opcodes that involve memory operations.
+	pc           uint16
+	stack        [stackSize]uint16
+	sp           byte
+	memory       [memorySize]byte
+	v            [vRegSize]byte // general purpose registers
+	vChanged     [vRegSize]bool
+	screenBuf    [screenWidth * screenHeigth]byte
+	drawFlag     bool
+	playingSound bool
+	key          [keyNumbers]byte
+	delayTimer   byte
+	soundTimer   byte
+	stopSignal   chan bool
 
 	info       emulator.OpcodeInfo
 	ScreenFunc func(emulator.ChipGetter)
@@ -83,7 +86,6 @@ func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
 		c.memory[i+512] = romData[i]
 	}
 	c.stopSignal = make(chan bool)
-	c.keyBoardInterrupt = make(chan byte)
 	return nil
 }
 
@@ -185,7 +187,8 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 		case <-clockTimer.C:
 			c.emulateCycle()
 
-		case k := <-c.keyBoardInterrupt:
+		// case k := <-c.keyBoardInterrupt:
+		case k := <-keyBoardInterrupt:
 			c.PressKey(k)
 		}
 	}
