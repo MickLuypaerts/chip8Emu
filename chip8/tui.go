@@ -1,6 +1,8 @@
 package chip8
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func (c *Chip8) GetKeyValues() []string {
 	var keys []string
@@ -69,13 +71,6 @@ func (c Chip8) GetScreen() ([]byte, int, int) {
 	return screen, screenWidth, screenHeigth
 }
 
-func (c Chip8) GetProgStats() []string {
-	progStats := []string{
-		fmt.Sprintf("OPCODE: 0x%04X", c.opcode),
-		fmt.Sprintf("Name:     %s", c.info.OpcodeName()),
-		fmt.Sprintf("Type: %s", c.info.OpcodeType()),
-		fmt.Sprintf("Desc: %s", c.info.OpcodeDesc()),
-		fmt.Sprintf("PC: %d", c.pc),
-	}
-	return progStats
+func (c Chip8) GetProgStats() string {
+	return c.info.String()
 }

@@ -32,7 +32,7 @@ type Chip interface {
 	GetStackValues() []string
 	GetMemoryValues() []string
 	GetMemoryRow() uint16
-	GetProgStats() []string
+	GetProgStats() string
 	GetScreen() ([]byte, int, int)
 }
 
@@ -81,11 +81,11 @@ func (t *TUI) initLMem(getMemoryValues func() []string, getMemoryRow func() uint
 	t.lMem.Rows = getMemoryValues()
 	t.lMem.SelectedRow = int(getMemoryRow())
 }
-func (t *TUI) initLProgStats(getProgStats func() []string) {
+func (t *TUI) initLProgStats(getProgStats func() string) {
 	t.lProgStats = widgets.NewList()
 	t.lProgStats.Title = fmt.Sprintf("INFO %s", os.Args[1])
 	t.lProgStats.WrapText = true
-	t.lProgStats.Rows = getProgStats()
+	t.lProgStats.Rows = []string{getProgStats()}
 }
 func (t *TUI) initCanvas() {
 	t.canvas = ui.NewCanvas()
@@ -114,7 +114,7 @@ func (t *TUI) initTermSize() {
 }
 
 func (t *TUI) SetEmuInfo(c Chip) {
-	t.lProgStats.Rows = c.GetProgStats()
+	t.lProgStats.Rows = []string{c.GetProgStats()}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = c.GetMemoryValues()
 	t.lMem.SelectedRow = int(c.GetMemoryRow())
