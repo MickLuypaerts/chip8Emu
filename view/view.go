@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	xOffSet = 2
-	yOffSet = 4
+	xOffSet       = 2
+	yOffSet       = 4
+	lMemRowLength = 16
 )
 
 type TUI struct {
@@ -28,19 +29,20 @@ type TUI struct {
 }
 
 type Chip interface {
-	GetGPRValues() []string
 	GetKeyValues() []string
 	GetStackValues() []string
-	GetMemoryValues() []string
-	GetProgStats() emulator.OpcodeInfo
+	GetMemoryValues() []byte
 	GetScreen() ([]byte, int, int)
+
+	GetGPRValues() []string
+	GetProgStats() emulator.OpcodeInfo
 }
 
 func (t *TUI) Init(c Chip) {
 	t.initLGPR(c.GetGPRValues)
 	t.initLKeys(c.GetKeyValues)
 	t.initLStack(c.GetStackValues)
-	t.initLMem(c.GetMemoryValues, c.GetProgStats())
+	t.initLMem(c)
 	t.initLProgStats(c.GetProgStats)
 	t.initCanvas()
 	t.initTermSize()
@@ -73,13 +75,37 @@ func (t *TUI) initLStack(getStackValues func() []string) {
 	t.lStack.WrapText = false
 	t.lStack.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
-func (t *TUI) initLMem(getMemoryValues func() []string, opcodeInfo emulator.OpcodeInfo) {
+func (t *TUI) initLMem(c Chip) {
 	t.lMem = widgets.NewList()
 	t.lMem.Title = "Memory"
 	t.lMem.TextStyle = ui.NewStyle(ui.ColorYellow)
 	t.lMem.WrapText = false
-	t.lMem.Rows = getMemoryValues()
-	t.SetListMemRow(opcodeInfo)
+
+	// t.lMem.Rows = c.GetMemoryValues()
+	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
+	t.SetListMemRow(c.GetProgStats())
+}
+
+func memoryToTUIMemory(memory []byte) []string {
+	var mem []string
+	var row string
+
+	rowCount := 0
+	columnCount := 0x0
+
+	for i := 0; i < len(memory); i++ {
+		if rowCount == 0 {
+			row = fmt.Sprintf("0x%04X ", columnCount<<4)
+			columnCount++
+		}
+		row += fmt.Sprintf("%02X ", memory[i])
+		rowCount++
+		if rowCount == lMemRowLength {
+			mem = append(mem, row)
+			rowCount = 0
+		}
+	}
+	return mem
 }
 func (t *TUI) initLProgStats(getProgStats func() emulator.OpcodeInfo) {
 	t.lProgStats = widgets.NewList()
@@ -116,16 +142,13 @@ func (t *TUI) initTermSize() {
 func (t *TUI) SetEmuInfo(c Chip) {
 	t.lProgStats.Rows = []string{fmt.Sprint(c.GetProgStats())}
 	t.lGPR.Rows = c.GetGPRValues()
-	t.lMem.Rows = c.GetMemoryValues()
+	// t.lMem.Rows = c.GetMemoryValues()
+	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
 	t.SetListMemRow(c.GetProgStats())
 	t.lStack.Rows = c.GetStackValues()
 
 	ui.Render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
 }
-
-const (
-	lMemRowLength = 16
-)
 
 func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
 	row := int(opcodeInfo.ProgramCount() / lMemRowLength)

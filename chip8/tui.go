@@ -37,30 +37,8 @@ func (c Chip8) GetStackValues() []string {
 	return stack
 }
 
-const (
-	lMemRowLength = 16
-)
-
-func (c Chip8) GetMemoryValues() []string {
-	var mem []string
-	var row string
-
-	rowCount := 0
-	columnCount := 0x0
-
-	for i := 0; i < len(c.memory); i++ {
-		if rowCount == 0 {
-			row = fmt.Sprintf("0x%04X ", columnCount<<4)
-			columnCount++
-		}
-		row += fmt.Sprintf("%02X ", c.memory[i])
-		rowCount++
-		if rowCount == lMemRowLength {
-			mem = append(mem, row)
-			rowCount = 0
-		}
-	}
-	return mem
+func (c Chip8) GetMemoryValues() []byte {
+	return c.memory[:]
 }
 
 func (c Chip8) GetScreen() ([]byte, int, int) {
