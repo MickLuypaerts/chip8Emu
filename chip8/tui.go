@@ -63,10 +63,6 @@ func (c Chip8) GetMemoryValues() []string {
 	return mem
 }
 
-func (c Chip8) GetMemoryRow() uint16 {
-	return uint16(c.pc / lMemRowLength)
-}
-
 func (c Chip8) GetScreen() ([]byte, int, int) {
 	screen := c.screenBuf[:]
 	return screen, screenWidth, screenHeigth

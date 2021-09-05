@@ -32,7 +32,6 @@ type Chip interface {
 	GetKeyValues() []string
 	GetStackValues() []string
 	GetMemoryValues() []string
-	GetMemoryRow() uint16
 	GetProgStats() emulator.OpcodeInfo
 	GetScreen() ([]byte, int, int)
 }
@@ -41,7 +40,7 @@ func (t *TUI) Init(c Chip) {
 	t.initLGPR(c.GetGPRValues)
 	t.initLKeys(c.GetKeyValues)
 	t.initLStack(c.GetStackValues)
-	t.initLMem(c.GetMemoryValues, c.GetMemoryRow)
+	t.initLMem(c.GetMemoryValues, c.GetProgStats())
 	t.initLProgStats(c.GetProgStats)
 	t.initCanvas()
 	t.initTermSize()
@@ -74,13 +73,13 @@ func (t *TUI) initLStack(getStackValues func() []string) {
 	t.lStack.WrapText = false
 	t.lStack.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
-func (t *TUI) initLMem(getMemoryValues func() []string, getMemoryRow func() uint16) {
+func (t *TUI) initLMem(getMemoryValues func() []string, opcodeInfo emulator.OpcodeInfo) {
 	t.lMem = widgets.NewList()
 	t.lMem.Title = "Memory"
 	t.lMem.TextStyle = ui.NewStyle(ui.ColorYellow)
 	t.lMem.WrapText = false
 	t.lMem.Rows = getMemoryValues()
-	t.lMem.SelectedRow = int(getMemoryRow())
+	t.SetListMemRow(opcodeInfo)
 }
 func (t *TUI) initLProgStats(getProgStats func() emulator.OpcodeInfo) {
 	t.lProgStats = widgets.NewList()
@@ -118,8 +117,7 @@ func (t *TUI) SetEmuInfo(c Chip) {
 	t.lProgStats.Rows = []string{fmt.Sprint(c.GetProgStats())}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = c.GetMemoryValues()
-	//t.lMem.SelectedRow = int(c.GetMemoryRow())
-	t.SetListMemRow(c)
+	t.SetListMemRow(c.GetProgStats())
 	t.lStack.Rows = c.GetStackValues()
 
 	ui.Render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
@@ -129,8 +127,8 @@ const (
 	lMemRowLength = 16
 )
 
-func (t *TUI) SetListMemRow(c Chip) {
-	row := int(c.GetProgStats().ProgramCount() / lMemRowLength)
+func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
+	row := int(opcodeInfo.ProgramCount() / lMemRowLength)
 	if row > len(t.lMem.Rows)-1 {
 		t.lMem.SelectedRow = len(t.lMem.Rows) - 1
 	} else if row < 0 {
