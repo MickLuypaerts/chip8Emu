@@ -147,7 +147,7 @@ func (c *Chip8) emulateCycle() {
 		drawSignal <- c.GetScreen()
 		c.drawFlag = false
 	}
-	c.SetEmuInfo(c) // crash maybe happening because we call ui.render at the twice at the same time
+	c.SetEmuInfo(c)
 }
 
 func (c Chip8) DrawSignal() <-chan []byte {
