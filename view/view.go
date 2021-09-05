@@ -131,7 +131,7 @@ func (t *TUI) initTermSize() {
 	t.termWidth, t.termHeight = ui.TerminalDimensions()
 }
 
-func (t *TUI) SetEmuInfo(c emulator.Chip) {
+func (t *TUI) SetEmuInfo(c emulator.ChipGetter) {
 	t.lProgStats.Rows = []string{fmt.Sprint(c.OpcodeInfo())}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
@@ -153,12 +153,12 @@ func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
 	ui.Render(t.lMem)
 }
 
-func (t *TUI) SetKeyInfo(c emulator.Chip) {
+func (t *TUI) SetKeyInfo(c emulator.ChipGetter) {
 	t.lKeys.Rows = c.GetKeyValues()
 	ui.Render(t.lKeys)
 }
 
-func (t *TUI) UpdateScreen(c emulator.Chip) {
+func (t *TUI) UpdateScreen(c emulator.ChipGetter) {
 	screenBuffer := c.GetScreen()
 	for y := 0; y < t.screenHeight; y++ {
 		for x := 0; x < t.screenWidth; x++ {

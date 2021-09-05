@@ -37,20 +37,20 @@ type Chip8 struct {
 	keyBoardInterrupt chan byte
 
 	info       emulator.OpcodeInfo
-	ScreenFunc func(emulator.Chip)
-	InfoFunc   func(emulator.Chip)
-	KeyFunc    func(emulator.Chip)
+	ScreenFunc func(emulator.ChipGetter)
+	InfoFunc   func(emulator.ChipGetter)
+	KeyFunc    func(emulator.ChipGetter)
 }
 
 func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
 	c.info = emulator.CreateOpcodeInfo(c.opcode, n, t, d, c.pc)
 }
 
-func (c *Chip8) Init(file string, screenFunc func(emulator.Chip), infoFunc func(emulator.Chip), keyFunc func(emulator.Chip)) error {
+func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
 	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
-	c.ScreenFunc = screenFunc
-	c.InfoFunc = infoFunc
-	c.KeyFunc = keyFunc
+	c.ScreenFunc = tui.UpdateScreen
+	c.InfoFunc = tui.SetEmuInfo
+	c.KeyFunc = tui.SetKeyInfo
 	romData, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err

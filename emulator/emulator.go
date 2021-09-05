@@ -9,8 +9,13 @@ import (
 )
 
 type Chip interface {
-	ChipIniter
+	Init(file string, tuiSetter TUISetter) error
+	ControlsMap() map[string]Control
 
+	ChipGetter
+}
+
+type ChipGetter interface {
 	GetKeyValues() []string
 	GetStackValues() []string
 
@@ -21,26 +26,21 @@ type Chip interface {
 	GetMemoryValues() []byte
 }
 
-type ChipIniter interface {
-	Init(file string, screenFunc func(Chip), infoFunc func(Chip), keyFunc func(Chip)) error
-	ControlsMap() map[string]Control
-}
-
 type TUI interface {
-	TUIIniter
-
-	UpdateScreen(c Chip)
-	SetEmuInfo(c Chip)
-	SetKeyInfo(c Chip)
-}
-
-type TUIIniter interface {
 	Init(c Chip)
 	Close()
 	Render()
 	Setup() error
 	KeyEvent() <-chan string
 	ControlsMap() map[string]Control
+
+	TUISetter
+}
+
+type TUISetter interface {
+	UpdateScreen(c ChipGetter)
+	SetEmuInfo(c ChipGetter)
+	SetKeyInfo(c ChipGetter)
 }
 
 type Emulator struct {
@@ -100,7 +100,7 @@ func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, er
 		return nil, err
 	}
 
-	err := e.chip.Init(args[1], t.UpdateScreen, t.SetEmuInfo, t.SetKeyInfo)
+	err := e.chip.Init(args[1], t)
 	if err != nil {
 		return nil, err
 	}
