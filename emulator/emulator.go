@@ -19,7 +19,6 @@ type ChipGetter interface {
 	GetKeyValues() []string
 	GetStackValues() []string
 
-	GetScreen() []byte
 	GetScreenSize() (int, int)
 	GetGPRValues() []string
 	OpcodeInfo() OpcodeInfo
