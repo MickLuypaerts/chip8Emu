@@ -1,6 +1,7 @@
 package view
 
 import (
+	"chip8/emulator"
 	"fmt"
 	"image"
 	"os"
@@ -32,7 +33,7 @@ type Chip interface {
 	GetStackValues() []string
 	GetMemoryValues() []string
 	GetMemoryRow() uint16
-	GetProgStats() string
+	GetProgStats() emulator.OpcodeInfo
 	GetScreen() ([]byte, int, int)
 }
 
@@ -81,11 +82,11 @@ func (t *TUI) initLMem(getMemoryValues func() []string, getMemoryRow func() uint
 	t.lMem.Rows = getMemoryValues()
 	t.lMem.SelectedRow = int(getMemoryRow())
 }
-func (t *TUI) initLProgStats(getProgStats func() string) {
+func (t *TUI) initLProgStats(getProgStats func() emulator.OpcodeInfo) {
 	t.lProgStats = widgets.NewList()
 	t.lProgStats.Title = fmt.Sprintf("INFO %s", os.Args[1])
 	t.lProgStats.WrapText = true
-	t.lProgStats.Rows = []string{getProgStats()}
+	t.lProgStats.Rows = []string{fmt.Sprint(getProgStats())}
 }
 func (t *TUI) initCanvas() {
 	t.canvas = ui.NewCanvas()
@@ -114,13 +115,30 @@ func (t *TUI) initTermSize() {
 }
 
 func (t *TUI) SetEmuInfo(c Chip) {
-	t.lProgStats.Rows = []string{c.GetProgStats()}
+	t.lProgStats.Rows = []string{fmt.Sprint(c.GetProgStats())}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = c.GetMemoryValues()
-	t.lMem.SelectedRow = int(c.GetMemoryRow())
+	//t.lMem.SelectedRow = int(c.GetMemoryRow())
+	t.SetListMemRow(c)
 	t.lStack.Rows = c.GetStackValues()
 
 	ui.Render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
+}
+
+const (
+	lMemRowLength = 16
+)
+
+func (t *TUI) SetListMemRow(c Chip) {
+	row := int(c.GetProgStats().ProgramCount() / lMemRowLength)
+	if row > len(t.lMem.Rows)-1 {
+		t.lMem.SelectedRow = len(t.lMem.Rows) - 1
+	} else if row < 0 {
+		t.lMem.SelectedRow = 0
+	} else {
+		t.lMem.SelectedRow = row
+	}
+	ui.Render(t.lMem)
 }
 
 func (t *TUI) SetKeyInfo(c Chip) {

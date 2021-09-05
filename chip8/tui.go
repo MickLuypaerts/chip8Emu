@@ -1,6 +1,7 @@
 package chip8
 
 import (
+	"chip8/emulator"
 	"fmt"
 )
 
@@ -71,6 +72,6 @@ func (c Chip8) GetScreen() ([]byte, int, int) {
 	return screen, screenWidth, screenHeigth
 }
 
-func (c Chip8) GetProgStats() string {
-	return c.info.String()
+func (c Chip8) GetProgStats() emulator.OpcodeInfo {
+	return c.info
 }

@@ -10,13 +10,12 @@ type OpcodeInfo struct {
 	programCount uint16
 }
 
-func (o *OpcodeInfo) String() string {
-	progStats := fmt.Sprintf("OPCODE: 0x%04X\n", o.opcode) +
+func (o OpcodeInfo) String() string {
+	return fmt.Sprintf("OPCODE: 0x%04X\n", o.opcode) +
 		fmt.Sprintf("Name:     %s\n", o.opcodeName) +
 		fmt.Sprintf("Type: %s\n", o.opcodeType) +
 		fmt.Sprintf("Desc: %s\n", o.opcodeDesc) +
 		fmt.Sprintf("PC: %d\n", o.programCount)
-	return progStats
 }
 
 func CreateOpcodeInfo(o uint16, n string, t string, d string, pc uint16) OpcodeInfo {
@@ -29,6 +28,9 @@ func CreateOpcodeInfo(o uint16, n string, t string, d string, pc uint16) OpcodeI
 	return oInfo
 }
 
+func (o OpcodeInfo) Opcode() uint16 {
+	return o.opcode
+}
 func (o OpcodeInfo) OpcodeName() string {
 	return o.opcodeName
 }
@@ -37,4 +39,8 @@ func (o OpcodeInfo) OpcodeType() string {
 }
 func (o OpcodeInfo) OpcodeDesc() string {
 	return o.opcodeDesc
+}
+
+func (o OpcodeInfo) ProgramCount() uint16 {
+	return o.programCount
 }
