@@ -29,6 +29,7 @@ type Chip8 struct {
 	vChanged          [vRegSize]bool
 	screenBuf         [screenWidth * screenHeigth]byte
 	drawFlag          bool
+	playingSound      bool
 	key               [keyNumbers]byte
 	delayTimer        byte
 	soundTimer        byte
@@ -42,10 +43,9 @@ type Chip8 struct {
 }
 
 type chip8Info struct {
-	opcodeName   string
-	opcodeType   string
-	opcodeDesc   string
-	playingSound bool
+	opcodeName string
+	opcodeType string
+	opcodeDesc string
 }
 
 func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
@@ -144,10 +144,10 @@ func (c *Chip8) updateTimers() {
 		c.delayTimer--
 	}
 	if c.soundTimer > 0 {
-		c.info.playingSound = true
+		c.playingSound = true
 		c.soundTimer--
 	} else {
-		c.info.playingSound = false
+		c.playingSound = false
 	}
 }
 
