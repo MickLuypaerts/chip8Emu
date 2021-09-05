@@ -20,6 +20,7 @@ func (c *Chip8) GetGPRValues() []string {
 			gpr = append(gpr, fmt.Sprintf("V%X:   %X", i, c.v[i]))
 		}
 	}
+	gpr = append(gpr, fmt.Sprintf("I :   %03X", c.i))
 	return gpr
 }
 
@@ -75,8 +76,6 @@ func (c Chip8) GetProgStats() []string {
 		fmt.Sprintf("Type: %s", c.info.opcodeType),
 		fmt.Sprintf("Desc: %s", c.info.opcodeDesc),
 		fmt.Sprintf("PC: %d", c.pc),
-		fmt.Sprintf("Index: %04X", c.i),
-		fmt.Sprintf("Sound: %v", c.info.playingSound),
 	}
 	return progStats
 }
