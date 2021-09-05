@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
-	"runtime"
 
 	ui "github.com/gizak/termui/v3"
 )
@@ -34,19 +32,16 @@ func main() {
 	TUI.Init(&chip8)
 	ui.Render(TUI.Grid)
 	uiEvents := ui.PollEvents()
-
-	controls, err := emulator.CreateKeyFuncMap(chip8.ControlsMap(), TUI.GetControlsMap())
+	quit := make(chan struct{})
+	controls, err := emulator.CreateKeyFuncMap(chip8.ControlsMap(), TUI.GetControlsMap(), "q", quit)
 	if err != nil {
 		log.Fatalf("failed to create controls: %v", err)
 	}
-	quit := make(chan struct{})
 	go func() {
 		<-quit
-		clearTerminal()
+		emulator.ClearTerminal()
 		os.Exit(0)
 	}()
-	controls["q"] = func() { close(quit) }
-
 	for {
 		e := <-uiEvents
 		emulator.ExecuteKeyFunction(controls, e.ID)
@@ -67,18 +62,4 @@ func usage() {
 	fmt.Printf("| k |  Mem map up   |\n")
 	fmt.Printf("| gg|  Mem map top  |\n")
 	fmt.Printf("| G |Mem map bottom |\n")
-}
-
-func clearTerminal() {
-	if runtime.GOOS == "windows" {
-		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	} else if runtime.GOOS == "linux" {
-		cmd := exec.Command("clear") //Linux example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	} else {
-		log.Println("operating system not supported for clearing terminal")
-	}
 }
