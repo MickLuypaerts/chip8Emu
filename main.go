@@ -33,7 +33,6 @@ func main() {
 
 	TUI.Init(&chip8)
 	ui.Render(TUI.Grid)
-	// previousKey := ""
 	uiEvents := ui.PollEvents()
 
 	controls, err := emulator.CreateKeyFuncMap(chip8.ControlsMap(), TUI.GetControlsMap())
