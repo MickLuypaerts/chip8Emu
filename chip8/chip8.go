@@ -20,6 +20,7 @@ const (
 
 var (
 	keyBoardInterrupt = make(chan byte)
+	stopSignal        = make(chan struct{})
 )
 
 type Chip8 struct {
@@ -37,7 +38,7 @@ type Chip8 struct {
 	key          [keyNumbers]byte
 	delayTimer   byte
 	soundTimer   byte
-	stopSignal   chan bool
+	running      bool
 
 	info       emulator.OpcodeInfo
 	ScreenFunc func(emulator.ChipGetter)
@@ -85,7 +86,6 @@ func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
 	for i := range romData {
 		c.memory[i+512] = romData[i]
 	}
-	c.stopSignal = make(chan bool)
 	return nil
 }
 
@@ -157,9 +157,11 @@ func (c *Chip8) emulateCycle() {
 }
 
 func (c *Chip8) run() {
+	stopSignal = make(chan struct{})
 	clock := time.NewTicker(clockCycleRate)
 	timers := time.NewTicker(timeCycleRate)
 	keyboard := time.NewTicker(keyboardCycleRate)
+	c.running = true
 
 	go c.runClockCycle(clock)
 	go c.runTimerCycle(timers)
@@ -169,7 +171,7 @@ func (c *Chip8) run() {
 func (c *Chip8) runKeyboardCycle(keyboardTimer *time.Ticker) {
 	for {
 		select {
-		case <-c.stopSignal:
+		case <-stopSignal:
 			keyboardTimer.Stop()
 			return
 		case <-keyboardTimer.C:
@@ -181,13 +183,12 @@ func (c *Chip8) runKeyboardCycle(keyboardTimer *time.Ticker) {
 func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 	for {
 		select {
-		case <-c.stopSignal:
+		case <-stopSignal:
 			clockTimer.Stop()
 			return
 		case <-clockTimer.C:
 			c.emulateCycle()
 
-		// case k := <-c.keyBoardInterrupt:
 		case k := <-keyBoardInterrupt:
 			c.PressKey(k)
 		}
@@ -197,7 +198,7 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 func (c *Chip8) runTimerCycle(timerTimer *time.Ticker) {
 	for {
 		select {
-		case <-c.stopSignal:
+		case <-stopSignal:
 			timerTimer.Stop()
 			return
 		case <-timerTimer.C:
@@ -207,9 +208,10 @@ func (c *Chip8) runTimerCycle(timerTimer *time.Ticker) {
 }
 
 func (c *Chip8) stop() {
-	c.stopSignal <- true
-	c.stopSignal <- true
-	c.stopSignal <- true
+	if c.running {
+		close(stopSignal)
+		c.running = false
+	}
 }
 
 func (c *Chip8) subtract(target, x, y uint16) {
