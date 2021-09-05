@@ -41,9 +41,12 @@ func (c Chip8) GetMemoryValues() []byte {
 	return c.memory[:]
 }
 
-func (c Chip8) GetScreen() ([]byte, int, int) {
-	screen := c.screenBuf[:]
-	return screen, screenWidth, screenHeigth
+func (c Chip8) GetScreenSize() (int, int) {
+	return screenWidth, screenHeigth
+}
+
+func (c Chip8) GetScreen() []byte {
+	return c.screenBuf[:]
 }
 
 func (c Chip8) GetProgStats() emulator.OpcodeInfo {

@@ -17,25 +17,28 @@ const (
 )
 
 type TUI struct {
-	lGPR       *widgets.List
-	lKeys      *widgets.List
-	lStack     *widgets.List
-	lMem       *widgets.List
-	lProgStats *widgets.List
-	canvas     *ui.Canvas
-	Grid       *ui.Grid
-	termWidth  int
-	termHeight int
+	lGPR         *widgets.List
+	lKeys        *widgets.List
+	lStack       *widgets.List
+	lMem         *widgets.List
+	lProgStats   *widgets.List
+	canvas       *ui.Canvas
+	screenWidth  int
+	screenHeight int
+	Grid         *ui.Grid
+	termWidth    int
+	termHeight   int
 }
 
 type Chip interface {
 	GetKeyValues() []string
 	GetStackValues() []string
-	GetMemoryValues() []byte
-	GetScreen() ([]byte, int, int)
 
+	GetScreen() []byte
+	GetScreenSize() (int, int)
 	GetGPRValues() []string
 	GetProgStats() emulator.OpcodeInfo
+	GetMemoryValues() []byte
 }
 
 func (t *TUI) Init(c Chip) {
@@ -46,6 +49,7 @@ func (t *TUI) Init(c Chip) {
 	t.initLProgStats(c.GetProgStats)
 	t.initCanvas()
 	t.initTermSize()
+	t.screenWidth, t.screenHeight = c.GetScreenSize()
 	t.initGrid()
 }
 
@@ -166,10 +170,10 @@ func (t *TUI) SetKeyInfo(c Chip) {
 }
 
 func (t *TUI) UpdateScreen(c Chip) {
-	screenBuffer, width, height := c.GetScreen()
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			if screenBuffer[x+(y*width)] != 0 {
+	screenBuffer := c.GetScreen()
+	for y := 0; y < t.screenHeight; y++ {
+		for x := 0; x < t.screenWidth; x++ {
+			if screenBuffer[x+(y*t.screenWidth)] != 0 {
 				t.canvas.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorRed)
 			} else {
 				t.canvas.SetPoint(image.Pt(x*xOffSet, y*yOffSet), ui.ColorWhite)
