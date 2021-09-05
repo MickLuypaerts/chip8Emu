@@ -40,10 +40,10 @@ type Chip8 struct {
 	soundTimer   byte
 	running      bool
 
-	info       emulator.OpcodeInfo
-	ScreenFunc func(emulator.ChipGetter)
-	InfoFunc   func(emulator.ChipGetter)
-	KeyFunc    func(emulator.ChipGetter)
+	info         emulator.OpcodeInfo
+	UpdateScreen func(emulator.ChipGetter)
+	SetEmuInfo   func(emulator.ChipGetter)
+	SetKeyInfo   func(emulator.ChipGetter)
 }
 
 func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
@@ -51,10 +51,10 @@ func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
 }
 
 func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
-	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
-	c.ScreenFunc = tui.UpdateScreen
-	c.InfoFunc = tui.SetEmuInfo
-	c.KeyFunc = tui.SetKeyInfo
+	c.pc = 0x200                      // programs written for the original system begin at memory location 512 (0x200)
+	c.UpdateScreen = tui.UpdateScreen // TODO: drawSingal so we can remove this weird function passing
+	c.SetEmuInfo = tui.SetEmuInfo
+	c.SetKeyInfo = tui.SetKeyInfo
 	romData, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
 	return nil
 }
 
-func (c *Chip8) ClearKeys() {
+func (c *Chip8) clearKeys() {
 	clearedKey := false
 	for i := range c.key {
 		if c.key[i] != 0 {
@@ -98,16 +98,11 @@ func (c *Chip8) ClearKeys() {
 		}
 	}
 	if clearedKey {
-		c.KeyFunc(c)
+		c.SetKeyInfo(c)
 	}
 }
 
-func (c *Chip8) ClearKey(key byte) {
-	c.key[key] = 0
-	c.KeyFunc(c)
-}
-
-func (c *Chip8) PressKey(key byte) {
+func (c *Chip8) pressKey(key byte) {
 	for i := range c.key {
 		if byte(i) == key {
 			if c.key[i] != 1 {
@@ -120,7 +115,7 @@ func (c *Chip8) PressKey(key byte) {
 			}
 		}
 	}
-	c.KeyFunc(c)
+	c.SetKeyInfo(c)
 }
 
 func (c *Chip8) clearScreen() {
@@ -150,10 +145,10 @@ func (c *Chip8) emulateCycle() {
 	c.decode()
 	c.updateTimers()
 	if c.drawFlag {
-		c.ScreenFunc(c)
+		c.UpdateScreen(c)
 		c.drawFlag = false
 	}
-	c.InfoFunc(c)
+	c.SetEmuInfo(c)
 }
 
 func (c *Chip8) run() {
@@ -175,7 +170,7 @@ func (c *Chip8) runKeyboardCycle(keyboardTimer *time.Ticker) {
 			keyboardTimer.Stop()
 			return
 		case <-keyboardTimer.C:
-			c.ClearKeys()
+			c.clearKeys()
 		}
 	}
 }
@@ -190,7 +185,7 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 			c.emulateCycle()
 
 		case k := <-keyBoardInterrupt:
-			c.PressKey(k)
+			c.pressKey(k)
 		}
 	}
 }
