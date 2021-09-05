@@ -2,6 +2,7 @@ package emulator
 
 import "fmt"
 
+// TODO: why is programCount here move programCount somewhere else or rename struc
 type OpcodeInfo struct {
 	opcode       uint16
 	opcodeName   string
