@@ -1,6 +1,7 @@
 package chip8
 
 import (
+	"chip8/emulator"
 	"chip8/view"
 	"io/ioutil"
 	"time"
@@ -36,22 +37,14 @@ type Chip8 struct {
 	stopSignal        chan bool
 	keyBoardInterrupt chan byte
 
-	info       chip8Info
+	info       emulator.OpcodeInfo
 	ScreenFunc func(view.Chip)
 	InfoFunc   func(view.Chip)
 	KeyFunc    func(view.Chip)
 }
 
-type chip8Info struct {
-	opcodeName string
-	opcodeType string
-	opcodeDesc string
-}
-
 func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
-	c.info.opcodeName = n
-	c.info.opcodeType = t
-	c.info.opcodeDesc = d
+	c.info = emulator.CreateOpcodeInfo(n, t, d)
 }
 
 func (c *Chip8) Init(file string, screenFunc func(view.Chip), infoFunc func(view.Chip), keyFunc func(view.Chip)) error {
