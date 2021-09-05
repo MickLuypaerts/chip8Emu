@@ -49,6 +49,6 @@ func (c Chip8) GetScreen() []byte {
 	return c.screenBuf[:]
 }
 
-func (c Chip8) GetProgStats() emulator.OpcodeInfo {
+func (c Chip8) OpcodeInfo() emulator.OpcodeInfo {
 	return c.info
 }

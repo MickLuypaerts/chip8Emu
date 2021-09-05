@@ -37,7 +37,7 @@ type Chip interface {
 	GetScreen() []byte
 	GetScreenSize() (int, int)
 	GetGPRValues() []string
-	GetProgStats() emulator.OpcodeInfo
+	OpcodeInfo() emulator.OpcodeInfo
 	GetMemoryValues() []byte
 }
 
@@ -46,7 +46,7 @@ func (t *TUI) Init(c Chip) {
 	t.initLKeys(c.GetKeyValues)
 	t.initLStack(c.GetStackValues)
 	t.initLMem(c)
-	t.initLProgStats(c.GetProgStats)
+	t.initLProgStats(c.OpcodeInfo)
 	t.initCanvas()
 	t.initTermSize()
 	t.screenWidth, t.screenHeight = c.GetScreenSize()
@@ -86,7 +86,7 @@ func (t *TUI) initLMem(c Chip) {
 	t.lMem.WrapText = false
 
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
-	t.SetListMemRow(c.GetProgStats())
+	t.SetListMemRow(c.OpcodeInfo())
 }
 
 func memoryToTUIMemory(memory []byte) []string {
@@ -143,10 +143,10 @@ func (t *TUI) initTermSize() {
 }
 
 func (t *TUI) SetEmuInfo(c Chip) {
-	t.lProgStats.Rows = []string{fmt.Sprint(c.GetProgStats())}
+	t.lProgStats.Rows = []string{fmt.Sprint(c.OpcodeInfo())}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
-	t.SetListMemRow(c.GetProgStats())
+	t.SetListMemRow(c.OpcodeInfo())
 	t.lStack.Rows = c.GetStackValues()
 
 	ui.Render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
