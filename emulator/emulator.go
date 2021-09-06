@@ -41,13 +41,16 @@ type TUISetter interface {
 	SetEmuInfo(c ChipGetter)
 }
 
+var (
+	quitSignal = make(chan struct{})
+)
+
 type Emulator struct {
 	chip     Chip
 	tui      TUI
 	controls map[string]func()
 
 	quitKey string
-	quit    chan struct{}
 }
 
 func (emu *Emulator) Run() {
@@ -55,7 +58,7 @@ func (emu *Emulator) Run() {
 	emu.tui.Render()
 
 	go func() {
-		<-emu.quit
+		<-quitSignal
 		clearTerminal()
 		os.Exit(0)
 	}()
@@ -86,7 +89,6 @@ func usage(name string, c map[string]Control, t map[string]Control) {
 func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, error) {
 	e := new(Emulator)
 	e.quitKey = quitKey
-	e.quit = make(chan struct{})
 	if len(args) < 2 {
 		usage(args[0], c.ControlsMap(), t.ControlsMap())
 		os.Exit(0)
@@ -105,14 +107,14 @@ func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, er
 
 	e.tui.Init(c.DrawSignal(), c.KeySignal(), e.chip)
 
-	e.controls, err = createKeyFuncMap(c.ControlsMap(), t.ControlsMap(), quitKey, e.quit)
+	e.controls, err = createKeyFuncMap(c.ControlsMap(), t.ControlsMap(), quitKey)
 	if err != nil {
 		return nil, err
 	}
 	return e, nil
 }
 
-func createKeyFuncMap(chip map[string]Control, tui map[string]Control, quitKey string, quitChan chan struct{}) (map[string]func(), error) {
+func createKeyFuncMap(chip map[string]Control, tui map[string]Control, quitKey string) (map[string]func(), error) {
 	c := make(map[string]func())
 	for k, v := range chip {
 		if _, ok := c[k]; !ok {
@@ -129,7 +131,7 @@ func createKeyFuncMap(chip map[string]Control, tui map[string]Control, quitKey s
 		}
 	}
 	if _, ok := c[quitKey]; !ok {
-		c[quitKey] = func() { close(quitChan) }
+		c[quitKey] = func() { close(quitSignal) }
 	}
 	return c, nil
 }
