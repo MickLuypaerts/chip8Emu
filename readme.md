@@ -82,6 +82,5 @@ https://github.com/gizak/termui/
 # Links
 [Roms](https://github.com/kripod/chip8-roms)
 [audio](https://dev.to/ik5/quick-and-dirty-audio-playing-in-golang-3n7c)
-[keylogger](https://github.com/MarinX/keylogger)
 [azul3 keyboard package](https://github.com/azul3d/engine/tree/master/keyboard)
 [azul3 keyboard package docs](https://pkg.go.dev/azul3d.org/engine/keyboard?utm_source=godoc)
