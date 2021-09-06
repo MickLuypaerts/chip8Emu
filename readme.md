@@ -17,19 +17,6 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 
 
 
-# controls
-|key|function|
-|---|---|
-|q|quit|
-|s|1 cycle|
-|r|run program|
-|R|stop program|
-|j|Mem map down|
-|k|Mem map up|
-|gg|Mem map top|
-|G|Mem map top|
-
-
 # TODO
 [X] Screen  
 [X] Input  
@@ -92,8 +79,9 @@ blocking channel for keyboard opcode: FX0A
 # packages
 https://github.com/gizak/termui/
 
-# Roms
-[keypad test](https://github.com/dmatlack/chip8/blob/master/roms/programs/Keypad%20Test%20%5BHap%2C%202006%5D.ch8)
-[space invaders](https://github.com/loktar00/chip8/blob/master/roms/Space%20Invaders%20%5BDavid%20Winter%5D.ch8)
-
-https://www.reddit.com/r/EmuDev/comments/osgerb/chip8_fx0a_never_getting_called/h6oeouj/
+# Links
+[Roms](https://github.com/kripod/chip8-roms)
+[audio](https://dev.to/ik5/quick-and-dirty-audio-playing-in-golang-3n7c)
+[keylogger](https://github.com/MarinX/keylogger)
+[azul3 keyboard package](https://github.com/azul3d/engine/tree/master/keyboard)
+[azul3 keyboard package docs](https://pkg.go.dev/azul3d.org/engine/keyboard?utm_source=godoc)
