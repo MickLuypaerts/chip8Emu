@@ -37,7 +37,6 @@ type TUI struct {
 
 func (t *TUI) Init(drawSignal <-chan []byte, keySignal <-chan []byte, c emulator.Chip) {
 	t.initLGPR(c.GetGPRValues)
-	//t.initLKeys(c.GetKeyValues)
 	t.initLKeys()
 	t.initLStack(c.GetStackValues)
 	t.initLMem(c)
@@ -57,12 +56,12 @@ func (t *TUI) Init(drawSignal <-chan []byte, keySignal <-chan []byte, c emulator
 	go func() {
 		for {
 			keys := <-keySignal
-			t.KeyInfo(keys)
+			t.keyInfo(keys)
 		}
 	}()
 }
 
-func (t *TUI) KeyInfo(keys []byte) {
+func (t *TUI) keyInfo(keys []byte) {
 	var keysFormat []string
 	for i := range keys {
 		keysFormat = append(keysFormat, fmt.Sprintf("K%X   %d", i, keys[i]))
@@ -103,7 +102,7 @@ func (t *TUI) initLMem(c emulator.Chip) {
 	t.lMem.WrapText = false
 
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
-	t.SetListMemRow(c.OpcodeInfo())
+	t.setListMemRow(c.OpcodeInfo())
 }
 
 func memoryToTUIMemory(memory []byte) []string {
@@ -163,13 +162,13 @@ func (t *TUI) SetEmuInfo(c emulator.ChipGetter) {
 	t.lProgStats.Rows = []string{fmt.Sprint(c.OpcodeInfo())}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
-	t.SetListMemRow(c.OpcodeInfo())
+	t.setListMemRow(c.OpcodeInfo())
 	t.lStack.Rows = c.GetStackValues()
 
 	render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
 }
 
-func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
+func (t *TUI) setListMemRow(opcodeInfo emulator.OpcodeInfo) {
 	row := int(opcodeInfo.ProgramCount() / lMemRowLength)
 	if row > len(t.lMem.Rows)-1 {
 		t.lMem.SelectedRow = len(t.lMem.Rows) - 1
