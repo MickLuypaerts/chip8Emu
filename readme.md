@@ -39,10 +39,11 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [ ] Opcodes  
 [X] Stepping Through the program  
 [X] Running the program  
-[ ] let user choose Hertz  
-[ ] Fix weird passing functions between Chip8 and TUI
-
+[ ] let user choose Hertz 
+[ ] Fix weird passing functions between Chip8 and TUI  
+[ ] Fix Bug in decode.go where we assign the PC for the TUI with setOpcodeInfo() but don't update it when we Skip  
 [X] Print controls in usage  
+[ ] Clean up Print usage
 
 ## Opcodes
 [X] 0NNN  
