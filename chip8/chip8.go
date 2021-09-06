@@ -198,7 +198,7 @@ func (c *Chip8) stop() {
 	}
 }
 
-func (c *Chip8) subtract(target, x, y uint16) {
+func (c *Chip8) subtract(target, x, y byte) {
 	if c.v[x] > c.v[y] {
 		c.v[0xF] = 1
 	} else {

@@ -28,7 +28,7 @@ func (c *Chip8) decode() {
 		}
 	case 0x4000:
 		c.setOpcodeInfo("4XNN", "Cond", "Skips the next instruction if VX does not equal NN. (Usually the next instruction is a jump to skip a code block);")
-		if c.v[c.getXFromOpcode()] != byte(c.getNNFromOpcode()) {
+		if c.v[c.getXFromOpcode()] != c.getNNFromOpcode() {
 			c.pc += 2
 		}
 	case 0x5000:
@@ -39,12 +39,12 @@ func (c *Chip8) decode() {
 	case 0x6000:
 		c.setOpcodeInfo("6XNN", "Const", "Sets VX to NN.")
 		index := c.getXFromOpcode()
-		c.v[index] = byte(c.getNNFromOpcode())
+		c.v[index] = c.getNNFromOpcode()
 		c.vChanged[index] = true
 	case 0x7000:
 		c.setOpcodeInfo("7XNN", "Const", "Adds NN to VX. (Carry flag is not changed);")
 		index := c.getXFromOpcode()
-		c.v[index] += byte(c.getNNFromOpcode())
+		c.v[index] += c.getNNFromOpcode()
 		c.vChanged[index] = true
 	case 0x8000:
 		c.decode0x8000()
@@ -63,7 +63,7 @@ func (c *Chip8) decode() {
 		c.setOpcodeInfo("CXNN", "Rand", "Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.")
 		randSource := rand.NewSource(time.Now().UnixNano())
 		r := rand.New(randSource)
-		c.v[c.getXFromOpcode()] = byte(uint16(r.Intn(256)) & c.getNNFromOpcode())
+		c.v[c.getXFromOpcode()] = byte(r.Intn(256)) & c.getNNFromOpcode()
 	case 0xD000:
 		c.setOpcodeInfo("DXYN", "Disp", "Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.")
 		x := uint16(c.v[c.getXFromOpcode()])
@@ -114,7 +114,7 @@ func (c *Chip8) decode0xF000() {
 	case 0x0029: // TODO: Fx29 check implementation
 		c.setOpcodeInfo("FX29", "MEM", "Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.")
 		var loc uint16
-		for i := uint16(0x0); i < 0x10; i++ {
+		for i := byte(0x0); i < 0x10; i++ {
 			if c.getXFromOpcode() == i {
 				c.i = loc
 			}
@@ -134,14 +134,14 @@ func (c *Chip8) decode0xF000() {
 		c.memory[c.i+2] = (c.v[c.getXFromOpcode()] % 100) % 10
 	case 0x0055: // TODO: FX55 should we increment I here?
 		c.setOpcodeInfo("FX55", "MEM", "Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
-		for i := 0; i <= int(c.getXFromOpcode()); i++ {
+		for i := byte(0x0); i <= c.getXFromOpcode(); i++ {
 			c.memory[c.i] = c.v[i]
 			c.i++
 		}
 		c.i++
 	case 0x0065: // TODO: FX65 should we increment I here?
 		c.setOpcodeInfo("FX65", "MEM", "Fills V0 to VX (including VX) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
-		for i := 0; i <= int(c.getXFromOpcode()); i++ {
+		for i := byte(0x0); i <= c.getXFromOpcode(); i++ {
 			c.v[i] = c.memory[c.i]
 			c.vChanged[i] = true
 			c.i++
@@ -257,22 +257,22 @@ func (c *Chip8) draw(x, y, h uint16) {
 	c.vChanged[0xF] = true
 }
 
-func (c Chip8) getXFromOpcode() uint16 {
-	return (c.opcode & 0x0F00) >> 8
+func (c Chip8) getXFromOpcode() byte {
+	return byte((c.opcode & 0x0F00) >> 8)
 }
 
-func (c Chip8) getYFromOpcode() uint16 {
-	return (c.opcode & 0x00F0) >> 4
+func (c Chip8) getYFromOpcode() byte {
+	return byte((c.opcode & 0x00F0) >> 4)
 }
 
 func (c Chip8) getNNNFromOpcode() uint16 {
 	return c.opcode & 0x0FFF
 }
 
-func (c Chip8) getNNFromOpcode() uint16 {
-	return c.opcode & 0x00FF
+func (c Chip8) getNNFromOpcode() byte {
+	return byte(c.opcode & 0x00FF)
 }
 
-func (c Chip8) getNFromOpcode() uint16 {
-	return c.opcode & 0x000F
+func (c Chip8) getNFromOpcode() byte {
+	return byte(c.opcode & 0x000F)
 }
