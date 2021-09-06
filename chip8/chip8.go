@@ -105,11 +105,6 @@ func (c *Chip8) pressKey(key byte) {
 			if c.key[i] != 1 {
 				c.key[i] = 1
 			}
-
-		} else {
-			if c.key[i] != 0 {
-				c.key[i] = 0
-			}
 		}
 	}
 	keySignal <- c.key[:]
