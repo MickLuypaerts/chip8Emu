@@ -16,19 +16,18 @@ type Chip interface {
 }
 
 type ChipGetter interface {
-	GetKeyValues() []string
 	GetStackValues() []string
-
 	GetScreenSize() (int, int)
 	GetGPRValues() []string
 	OpcodeInfo() OpcodeInfo
 	GetMemoryValues() []byte
 
 	DrawSignal() <-chan []byte
+	KeySignal() <-chan []byte
 }
 
 type TUI interface {
-	Init(drawSignal <-chan []byte, c Chip)
+	Init(drawSignal <-chan []byte, keySignal <-chan []byte, c Chip)
 	Close()
 	Render()
 	Setup() error
@@ -40,7 +39,6 @@ type TUI interface {
 
 type TUISetter interface {
 	SetEmuInfo(c ChipGetter)
-	SetKeyInfo(c ChipGetter)
 }
 
 type Emulator struct {
@@ -105,7 +103,7 @@ func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, er
 		return nil, err
 	}
 
-	e.tui.Init(c.DrawSignal(), e.chip)
+	e.tui.Init(c.DrawSignal(), c.KeySignal(), e.chip)
 
 	e.controls, err = createKeyFuncMap(c.ControlsMap(), t.ControlsMap(), quitKey, e.quit)
 	if err != nil {

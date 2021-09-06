@@ -35,9 +35,10 @@ type TUI struct {
 	termHeight   int
 }
 
-func (t *TUI) Init(drawSignal <-chan []byte, c emulator.Chip) {
+func (t *TUI) Init(drawSignal <-chan []byte, keySignal <-chan []byte, c emulator.Chip) {
 	t.initLGPR(c.GetGPRValues)
-	t.initLKeys(c.GetKeyValues)
+	//t.initLKeys(c.GetKeyValues)
+	t.initLKeys()
 	t.initLStack(c.GetStackValues)
 	t.initLMem(c)
 	t.initLProgStats(c.OpcodeInfo)
@@ -53,6 +54,21 @@ func (t *TUI) Init(drawSignal <-chan []byte, c emulator.Chip) {
 			}
 		}
 	}()
+	go func() {
+		for {
+			keys := <-keySignal
+			t.KeyInfo(keys)
+		}
+	}()
+}
+
+func (t *TUI) KeyInfo(keys []byte) {
+	var keysFormat []string
+	for i := range keys {
+		keysFormat = append(keysFormat, fmt.Sprintf("K%X   %d", i, keys[i]))
+	}
+	t.lKeys.Rows = keysFormat
+	render(t.lKeys)
 }
 
 func (t *TUI) initLGPR(getGPRValues func() []string) {
@@ -64,10 +80,9 @@ func (t *TUI) initLGPR(getGPRValues func() []string) {
 	t.lGPR.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
 }
 
-func (t *TUI) initLKeys(getKeyValues func() []string) {
+func (t *TUI) initLKeys() {
 	t.lKeys = widgets.NewList()
 	t.lKeys.Title = "Keys"
-	t.lKeys.Rows = getKeyValues()
 	t.lKeys.TextStyle = ui.NewStyle(ui.ColorYellow)
 	t.lKeys.WrapText = false
 	t.lKeys.SelectedRowStyle = ui.NewStyle(ui.ColorYellow)
@@ -164,11 +179,6 @@ func (t *TUI) SetListMemRow(opcodeInfo emulator.OpcodeInfo) {
 		t.lMem.SelectedRow = row
 	}
 	render(t.lMem)
-}
-
-func (t *TUI) SetKeyInfo(c emulator.ChipGetter) {
-	t.lKeys.Rows = c.GetKeyValues()
-	render(t.lKeys)
 }
 
 func (t *TUI) updateScreen(screenBuffer []byte) {

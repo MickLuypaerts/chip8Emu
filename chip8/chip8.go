@@ -21,6 +21,7 @@ var (
 	keyBoardInterrupt = make(chan byte)
 	stopSignal        = make(chan struct{})
 	drawSignal        = make(chan []byte)
+	keySignal         = make(chan []byte)
 	running           = false
 )
 
@@ -42,7 +43,6 @@ type Chip8 struct {
 
 	info       emulator.OpcodeInfo
 	SetEmuInfo func(emulator.ChipGetter)
-	SetKeyInfo func(emulator.ChipGetter)
 }
 
 func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
@@ -52,7 +52,6 @@ func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
 func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
 	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
 	c.SetEmuInfo = tui.SetEmuInfo
-	c.SetKeyInfo = tui.SetKeyInfo
 	romData, err := ioutil.ReadFile(file)
 	if err != nil {
 		return err
@@ -96,7 +95,7 @@ func (c *Chip8) clearKeys() {
 		}
 	}
 	if clearedKey {
-		c.SetKeyInfo(c)
+		keySignal <- c.key[:]
 	}
 }
 
@@ -113,7 +112,7 @@ func (c *Chip8) pressKey(key byte) {
 			}
 		}
 	}
-	c.SetKeyInfo(c)
+	keySignal <- c.key[:]
 }
 
 func (c *Chip8) clearScreen() {
@@ -208,4 +207,8 @@ func (c *Chip8) subtract(target, x, y uint16) {
 	c.vChanged[0xF] = true
 	c.v[target] = c.v[x] - c.v[y]
 	c.vChanged[target] = true
+}
+
+func (c Chip8) KeySignal() <-chan []byte {
+	return keySignal
 }
