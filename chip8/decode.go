@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+// TODO: should decode just return the opcode name
+//       and then have a method Execute that uses a map[string]func() to execute the opcode
 func (c *Chip8) decode() {
 	c.pc += 2
 	switch c.opcode & 0xF000 {
