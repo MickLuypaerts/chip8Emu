@@ -5,14 +5,6 @@ import (
 	"fmt"
 )
 
-func (c *Chip8) GetKeyValues() []string {
-	var keys []string
-	for i := range c.key {
-		keys = append(keys, fmt.Sprintf("K%X   %d", i, c.key[i]))
-	}
-	return keys
-}
-
 func (c *Chip8) GetGPRValues() []string {
 	var gpr []string
 	for i := range c.v {
