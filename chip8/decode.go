@@ -198,7 +198,7 @@ func (c *Chip8) decode0x8000() {
 			c.v[0xF] = 0
 		}
 		c.vChanged[0xF] = true
-		c.v[index] <<= 1
+		c.v[index] >>= 1
 		c.vChanged[index] = true
 	case 0x0007:
 		c.setOpcodeInfo("8XY7", "Math", "Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there is not.")
@@ -214,7 +214,7 @@ func (c *Chip8) decode0x8000() {
 			c.v[0xF] = 0
 		}
 		c.vChanged[0xF] = true
-		c.v[index] >>= 1
+		c.v[index] <<= 1
 		c.vChanged[index] = true
 	default:
 		log.Printf("[ERROR]: Unknown opcode: ox%X\n", c.opcode)
