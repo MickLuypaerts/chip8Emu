@@ -49,8 +49,6 @@ type Emulator struct {
 	chip     Chip
 	tui      TUI
 	controls map[string]func()
-
-	quitKey string
 }
 
 func (emu *Emulator) Run() {
@@ -88,7 +86,6 @@ func usage(name string, c map[string]Control, t map[string]Control) {
 
 func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, error) {
 	e := new(Emulator)
-	e.quitKey = quitKey
 	if len(args) < 2 {
 		usage(args[0], c.ControlsMap(), t.ControlsMap())
 		os.Exit(0)
