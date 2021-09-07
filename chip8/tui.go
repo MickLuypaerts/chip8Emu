@@ -37,6 +37,6 @@ func (c Chip8) GetScreenSize() (int, int) {
 	return screenWidth, screenHeigth
 }
 
-func (c Chip8) OpcodeInfo() emulator.OpcodeInfo {
+func (c Chip8) EmulatorInfo() emulator.EmulatorInfo {
 	return c.info
 }

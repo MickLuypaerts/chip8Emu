@@ -15,7 +15,7 @@ type ChipGetter interface {
 	GetStackValues() []string
 	GetScreenSize() (int, int)
 	GetGPRValues() []string
-	OpcodeInfo() OpcodeInfo
+	EmulatorInfo() EmulatorInfo
 	GetMemoryValues() []byte
 
 	DrawSignal() <-chan []byte

@@ -40,7 +40,7 @@ func (t *TUI) Init(drawSignal <-chan []byte, keySignal <-chan []byte, c emulator
 	t.initLKeys()
 	t.initLStack(c.GetStackValues)
 	t.initLMem(c)
-	t.initLProgStats(c.OpcodeInfo)
+	t.initLProgStats(c.EmulatorInfo)
 	t.initCanvas()
 	t.initTermSize()
 	t.screenWidth, t.screenHeight = c.GetScreenSize()
@@ -98,7 +98,7 @@ func (t *TUI) initLMem(c emulator.Chip) {
 	t.lMem.WrapText = false
 
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
-	t.setListMemRow(c.OpcodeInfo())
+	t.setListMemRow(c.EmulatorInfo())
 }
 
 func memoryToTUIMemory(memory []byte) []string {
@@ -122,7 +122,7 @@ func memoryToTUIMemory(memory []byte) []string {
 	}
 	return mem
 }
-func (t *TUI) initLProgStats(getProgStats func() emulator.OpcodeInfo) {
+func (t *TUI) initLProgStats(getProgStats func() emulator.EmulatorInfo) {
 	t.lProgStats = widgets.NewList()
 	t.lProgStats.Title = fmt.Sprintf("INFO %s", os.Args[1])
 	t.lProgStats.WrapText = true
@@ -155,17 +155,17 @@ func (t *TUI) initTermSize() {
 }
 
 func (t *TUI) SetEmuInfo(c emulator.ChipGetter) {
-	t.lProgStats.Rows = []string{fmt.Sprint(c.OpcodeInfo())}
+	t.lProgStats.Rows = []string{fmt.Sprint(c.EmulatorInfo())}
 	t.lGPR.Rows = c.GetGPRValues()
 	t.lMem.Rows = memoryToTUIMemory(c.GetMemoryValues())
-	t.setListMemRow(c.OpcodeInfo())
+	t.setListMemRow(c.EmulatorInfo())
 	t.lStack.Rows = c.GetStackValues()
 
 	render(t.lProgStats, t.lGPR, t.lMem, t.lStack)
 }
 
-func (t *TUI) setListMemRow(opcodeInfo emulator.OpcodeInfo) {
-	row := int(opcodeInfo.ProgramCount() / lMemRowLength)
+func (t *TUI) setListMemRow(emulatorInfo emulator.EmulatorInfo) {
+	row := int(emulatorInfo.ProgramCount() / lMemRowLength)
 	if row > len(t.lMem.Rows)-1 {
 		t.lMem.SelectedRow = len(t.lMem.Rows) - 1
 	} else if row < 0 {

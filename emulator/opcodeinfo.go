@@ -2,8 +2,7 @@ package emulator
 
 import "fmt"
 
-// TODO: why is programCount here move programCount somewhere else or rename struc
-type OpcodeInfo struct {
+type EmulatorInfo struct {
 	programCount uint16
 	opcode       uint16
 	opcodeName   string
@@ -11,7 +10,7 @@ type OpcodeInfo struct {
 	opcodeDesc   string
 }
 
-func (o OpcodeInfo) String() string {
+func (o EmulatorInfo) String() string {
 	return fmt.Sprintf("PC: %d\n", o.programCount) +
 		fmt.Sprintf("OPCODE: 0x%04X\n", o.opcode) +
 		fmt.Sprintf("Name:     %s\n", o.opcodeName) +
@@ -19,10 +18,10 @@ func (o OpcodeInfo) String() string {
 		fmt.Sprintf("Desc: %s\n", o.opcodeDesc)
 }
 
-func CreateOpcodeInfo(o uint16, n string, t string, d string, pc uint16) OpcodeInfo {
-	return OpcodeInfo{programCount: pc, opcode: o, opcodeName: n, opcodeType: t, opcodeDesc: d}
+func CreateEmulatorInfo(o uint16, n string, t string, d string, pc uint16) EmulatorInfo {
+	return EmulatorInfo{programCount: pc, opcode: o, opcodeName: n, opcodeType: t, opcodeDesc: d}
 }
 
-func (o OpcodeInfo) ProgramCount() uint16 {
+func (o EmulatorInfo) ProgramCount() uint16 {
 	return o.programCount
 }

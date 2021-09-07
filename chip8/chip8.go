@@ -42,7 +42,7 @@ type Chip8 struct {
 	delayTimer   byte
 	soundTimer   byte
 
-	info       emulator.OpcodeInfo
+	info       emulator.EmulatorInfo
 	SetEmuInfo func(emulator.ChipGetter)
 }
 
@@ -167,8 +167,8 @@ func (c *Chip8) stop() {
 	}
 }
 
-func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
-	c.info = emulator.CreateOpcodeInfo(c.opcode, n, t, d, c.pc)
+func (c *Chip8) setEmulatorInfo(n string, t string, d string) {
+	c.info = emulator.CreateEmulatorInfo(c.opcode, n, t, d, c.pc)
 }
 
 func (c *Chip8) clearKeys() {
