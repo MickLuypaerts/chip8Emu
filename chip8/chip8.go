@@ -111,12 +111,6 @@ func (c *Chip8) pressKey(key byte) {
 	keySignal <- c.key[:]
 }
 
-func (c *Chip8) clearScreen() {
-	for i := range c.screenBuf {
-		c.screenBuf[i] = 0
-	}
-}
-
 func (c *Chip8) fetch() {
 	c.opcode = uint16(c.memory[c.pc])<<8 | uint16(c.memory[c.pc+1])
 }
@@ -195,17 +189,6 @@ func (c *Chip8) stop() {
 		close(stopSignal)
 		running = false
 	}
-}
-
-func (c *Chip8) subtract(target, x, y byte) {
-	if c.v[x] > c.v[y] {
-		c.v[0xF] = 1
-	} else {
-		c.v[0xF] = 0
-	}
-	c.vChanged[0xF] = true
-	c.v[target] = c.v[x] - c.v[y]
-	c.vChanged[target] = true
 }
 
 func (c Chip8) KeySignal() <-chan []byte {
