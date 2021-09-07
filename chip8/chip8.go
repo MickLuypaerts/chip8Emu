@@ -19,10 +19,10 @@ const (
 )
 
 var (
-	keyboardInterrupt = make(chan byte, 256)
+	keyboardInterrupt = make(chan byte, 1)
 	stopSignal        = make(chan struct{})
 	drawSignal        = make(chan []byte)
-	keySignal         = make(chan []byte, 256)
+	keySignal         = make(chan []byte, 1)
 	running           = false
 )
 

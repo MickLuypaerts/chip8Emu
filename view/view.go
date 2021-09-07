@@ -229,7 +229,7 @@ func (t TUI) Setup() error {
 }
 
 func (t TUI) KeyEvent() <-chan string {
-	ch := make(chan string, 256)
+	ch := make(chan string, 1)
 	keyEvents := ui.PollEvents()
 	go func() {
 		for {
