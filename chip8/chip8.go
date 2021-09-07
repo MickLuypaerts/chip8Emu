@@ -7,14 +7,15 @@ import (
 )
 
 const (
-	memorySize     = 4096
-	vRegSize       = 16
-	stackSize      = 16
-	screenWidth    = 64
-	screenHeigth   = 32
-	keyNumbers     = 16
-	clockCycleRate = 2 * time.Microsecond
-	timeCycleRate  = 16 * time.Microsecond
+	memorySize            = 4096
+	vRegSize              = 16
+	stackSize             = 16
+	screenWidth           = 64
+	screenHeigth          = 32
+	keyNumbers            = 16
+	clockCycleRate        = 2 * time.Microsecond
+	timeCycleRate         = 16 * time.Microsecond
+	keyBoardResetDuration = 50 * time.Millisecond
 )
 
 var (
@@ -158,6 +159,7 @@ func (c *Chip8) run() {
 }
 
 func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
+	keyBoardResetTimer := time.NewTimer(keyBoardResetDuration)
 	for {
 		select {
 		case <-stopSignal:
@@ -167,8 +169,10 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 			c.emulateCycle()
 
 		case k := <-keyBoardInterrupt:
+			keyBoardResetTimer.Stop()
+			keyBoardResetTimer.Reset(keyBoardResetDuration)
 			c.pressKey(k)
-		default:
+		case <-keyBoardResetTimer.C:
 			c.clearKeys()
 		}
 	}
