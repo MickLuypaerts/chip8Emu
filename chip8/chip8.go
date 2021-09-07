@@ -46,10 +46,6 @@ type Chip8 struct {
 	SetEmuInfo func(emulator.ChipGetter)
 }
 
-func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
-	c.info = emulator.CreateOpcodeInfo(c.opcode, n, t, d, c.pc)
-}
-
 func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
 	c.pc = 0x200 // programs written for the original system begin at memory location 512 (0x200)
 	c.SetEmuInfo = tui.SetEmuInfo
@@ -87,28 +83,12 @@ func (c *Chip8) Init(file string, tui emulator.TUISetter) error {
 	return nil
 }
 
-func (c *Chip8) clearKeys() {
-	clearedKey := false
-	for i := range c.key {
-		if c.key[i] != 0 {
-			c.key[i] = 0
-			clearedKey = true
-		}
-	}
-	if clearedKey {
-		keySignal <- c.key[:]
-	}
+func (c Chip8) KeySignal() <-chan []byte {
+	return keySignal
 }
 
-func (c *Chip8) pressKey(key byte) {
-	for i := range c.key {
-		if byte(i) == key {
-			if c.key[i] != 1 {
-				c.key[i] = 1
-			}
-		}
-	}
-	keySignal <- c.key[:]
+func (c Chip8) DrawSignal() <-chan []byte {
+	return drawSignal
 }
 
 func (c *Chip8) fetch() {
@@ -136,10 +116,6 @@ func (c *Chip8) emulateCycle() {
 		c.drawFlag = false
 	}
 	c.SetEmuInfo(c)
-}
-
-func (c Chip8) DrawSignal() <-chan []byte {
-	return drawSignal
 }
 
 func (c *Chip8) run() {
@@ -191,6 +167,30 @@ func (c *Chip8) stop() {
 	}
 }
 
-func (c Chip8) KeySignal() <-chan []byte {
-	return keySignal
+func (c *Chip8) setOpcodeInfo(n string, t string, d string) {
+	c.info = emulator.CreateOpcodeInfo(c.opcode, n, t, d, c.pc)
+}
+
+func (c *Chip8) clearKeys() {
+	clearedKey := false
+	for i := range c.key {
+		if c.key[i] != 0 {
+			c.key[i] = 0
+			clearedKey = true
+		}
+	}
+	if clearedKey {
+		keySignal <- c.key[:]
+	}
+}
+
+func (c *Chip8) pressKey(key byte) {
+	for i := range c.key {
+		if byte(i) == key {
+			if c.key[i] != 1 {
+				c.key[i] = 1
+			}
+		}
+	}
+	keySignal <- c.key[:]
 }
