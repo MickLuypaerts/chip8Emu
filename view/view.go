@@ -47,16 +47,12 @@ func (t *TUI) Init(drawSignal <-chan []byte, keySignal <-chan []byte, c emulator
 	t.initGrid()
 	go func() {
 		for {
-			screen := <-drawSignal
-			if screen != nil {
+			select {
+			case keys := <-keySignal:
+				t.keyInfo(keys)
+			case screen := <-drawSignal:
 				t.updateScreen(screen)
 			}
-		}
-	}()
-	go func() {
-		for {
-			keys := <-keySignal
-			t.keyInfo(keys)
 		}
 	}()
 }
