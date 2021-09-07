@@ -23,19 +23,6 @@ func CreateOpcodeInfo(o uint16, n string, t string, d string, pc uint16) OpcodeI
 	return OpcodeInfo{programCount: pc, opcode: o, opcodeName: n, opcodeType: t, opcodeDesc: d}
 }
 
-func (o OpcodeInfo) Opcode() uint16 {
-	return o.opcode
-}
-func (o OpcodeInfo) OpcodeName() string {
-	return o.opcodeName
-}
-func (o OpcodeInfo) OpcodeType() string {
-	return o.opcodeType
-}
-func (o OpcodeInfo) OpcodeDesc() string {
-	return o.opcodeDesc
-}
-
 func (o OpcodeInfo) ProgramCount() uint16 {
 	return o.programCount
 }
