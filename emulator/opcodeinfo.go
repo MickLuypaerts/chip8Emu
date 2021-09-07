@@ -20,13 +20,7 @@ func (o OpcodeInfo) String() string {
 }
 
 func CreateOpcodeInfo(o uint16, n string, t string, d string, pc uint16) OpcodeInfo {
-	var oInfo OpcodeInfo
-	oInfo.opcode = o
-	oInfo.opcodeName = n
-	oInfo.opcodeType = t
-	oInfo.opcodeDesc = d
-	oInfo.programCount = pc
-	return oInfo
+	return OpcodeInfo{programCount: pc, opcode: o, opcodeName: n, opcodeType: t, opcodeDesc: d}
 }
 
 func (o OpcodeInfo) Opcode() uint16 {
