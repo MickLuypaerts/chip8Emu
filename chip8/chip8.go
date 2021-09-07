@@ -15,11 +15,11 @@ const (
 	keyNumbers            = 16
 	clockCycleRate        = 2 * time.Microsecond
 	timeCycleRate         = 16 * time.Microsecond
-	keyBoardResetDuration = 50 * time.Millisecond
+	keyboardResetDuration = 50 * time.Millisecond
 )
 
 var (
-	keyBoardInterrupt = make(chan byte, 256)
+	keyboardInterrupt = make(chan byte, 256)
 	stopSignal        = make(chan struct{})
 	drawSignal        = make(chan []byte)
 	keySignal         = make(chan []byte, 256)
@@ -159,7 +159,7 @@ func (c *Chip8) run() {
 }
 
 func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
-	keyBoardResetTimer := time.NewTimer(keyBoardResetDuration)
+	keyboardResetTimer := time.NewTimer(keyboardResetDuration)
 	for {
 		select {
 		case <-stopSignal:
@@ -168,11 +168,11 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 		case <-clockTimer.C:
 			c.emulateCycle()
 
-		case k := <-keyBoardInterrupt:
-			keyBoardResetTimer.Stop()
-			keyBoardResetTimer.Reset(keyBoardResetDuration)
+		case k := <-keyboardInterrupt:
+			keyboardResetTimer.Stop()
+			keyboardResetTimer.Reset(keyboardResetDuration)
 			c.pressKey(k)
-		case <-keyBoardResetTimer.C:
+		case <-keyboardResetTimer.C:
 			c.clearKeys()
 		}
 	}
