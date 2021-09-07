@@ -1,12 +1,7 @@
 package emulator
 
 import (
-	"fmt"
-	"log"
 	"os"
-	"os/exec"
-	"runtime"
-	"strings"
 )
 
 type Chip interface {
@@ -68,43 +63,6 @@ func (emu *Emulator) Run() {
 	}
 }
 
-func usage(name string, c map[string]Control, t map[string]Control) {
-	pUsage, pKey := usagePadding(c, t)
-	fmt.Printf("Usage: %s [FILE]\n\n", "chip8")
-	fmt.Printf("Emulator Controls:\n")
-	fmt.Printf("|" + strings.Repeat("-", pKey+1) + "|" + strings.Repeat("-", pUsage+1) + "|\n")
-	fmt.Printf("| %-*s| %-*s|\n", pKey, "key", pUsage, "function")
-	fmt.Printf("|" + strings.Repeat("-", pKey+1) + "|" + strings.Repeat("-", pUsage+1) + "|\n")
-	for key := range c {
-		fmt.Printf("| %-*s| %-*s|\n", pKey, key, pUsage, c[key].usage)
-	}
-	fmt.Printf("|" + strings.Repeat("-", pKey+1) + "|" + strings.Repeat("-", pUsage+1) + "|\n")
-	for key := range t {
-		fmt.Printf("| %-*s| %-*s|\n", pKey, key, pUsage, t[key].usage)
-	}
-}
-func usagePadding(c map[string]Control, t map[string]Control) (int, int) {
-	maxLenUsage := 0
-	maxLenKey := 0
-	for key := range c {
-		if maxLenUsage < len(c[key].usage) {
-			maxLenUsage = len(c[key].usage)
-		}
-		if maxLenKey < len(key) {
-			maxLenKey = len(key)
-		}
-	}
-	for key := range t {
-		if maxLenUsage < len(t[key].usage) {
-			maxLenUsage = len(t[key].usage)
-		}
-		if maxLenKey < len(key) {
-			maxLenKey = len(key)
-		}
-	}
-	return maxLenUsage + 1, maxLenKey + 1
-}
-
 func CreateEmulator(args []string, quitKey string, c Chip, t TUI) (*Emulator, error) {
 	e := new(Emulator)
 	if len(args) < 2 {
@@ -157,19 +115,5 @@ func createKeyFuncMap(chip map[string]Control, tui map[string]Control, quitKey s
 func executeKeyFunction(m map[string]func(), k string) {
 	if f, ok := m[k]; ok {
 		f()
-	}
-}
-
-func clearTerminal() {
-	if runtime.GOOS == "windows" {
-		cmd := exec.Command("cmd", "/c", "cls")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	} else if runtime.GOOS == "linux" {
-		cmd := exec.Command("clear")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	} else {
-		log.Println("operating system not supported for clearing terminal")
 	}
 }
