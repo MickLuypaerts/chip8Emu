@@ -2,13 +2,18 @@ A Chip8 emulator in GO
 
 # Chip8
 ## Memory
+4096 memory locations, all of which are 8-bits
 ### Font
 in modern CHIP-8 implementations, where the interpreter is running natively outside the 4K memory space, there is no need to avoid the lower 512 bytes of memory (0x000-0x200), and it is common to store font data there.
 
-### stack
+## Stack
 The stack is an array of 16 16-bit values, used to store the address that the interpreter shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
 
-### Timers 
+## Registers
+16 8-bit registers V0 to VF. VF register is also used as a flag for some instructions.
+1 12-bit register I used in opcodes that invole memory operations.
+
+## Timers 
 Timers
 CHIP-8 has two timers. They both count down at 60 hertz, until they reach 0.
 
@@ -16,23 +21,15 @@ Delay timer: This timer is intended to be used for timing the events of games. I
 Sound timer: This timer is used for sound effects. When its value is nonzero, a beeping sound is made.
 
 
-
 # TODO
-[X] Screen  
-[X] Input  
 [ ] Fix buggy input
-[X] Add rest of the controls  
 [ ] Sound  
 [ ] Opcodes  
-[X] Stepping Through the program  
-[X] Running the program  
 [ ] let user choose Hertz 
-[ ] Fix weird passing functions between Chip8 and TUI  
+[ ] Fix weird passing functions between Chip8 and TUI
 [ ] Fix Bug in decode.go where we assign the PC for the TUI with setEmulatorInfo() but don't update it when we Skip  
-[X] Print controls in usage  
-[ ] Clean up Print usage
 
-## Opcodes
+# Opcodes list
 [X] 0NNN  
 [X] 00E0  
 [X] 00EE  
