@@ -27,7 +27,6 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [ ] Opcodes  
 [ ] let user choose Hertz 
 [ ] Fix weird passing functions between Chip8 and TUI
-[ ] Fix Bug in decode.go where we assign the PC for the TUI with setEmulatorInfo() but don't update it when we Skip  
 
 # Opcodes list
 [X] 0NNN  
