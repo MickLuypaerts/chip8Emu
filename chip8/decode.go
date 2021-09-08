@@ -8,6 +8,9 @@ import (
 
 // TODO: should decode just return the opcode name
 //       and then have a method Execute that uses a map[string]func() to execute the opcode
+
+// TODO: remove all the c.vChanged[index] = true from here to somewhere else change of forgetting to add it
+//       are too big
 func (c *Chip8) decode() {
 	c.pc += 2
 	switch c.opcode & 0xF000 {
@@ -64,6 +67,7 @@ func (c *Chip8) decode() {
 		randSource := rand.NewSource(time.Now().UnixNano())
 		r := rand.New(randSource)
 		c.v[c.getXFromOpcode()] = byte(r.Intn(256)) & c.getNNFromOpcode()
+		c.vChanged[c.getXFromOpcode()] = true
 	case 0xD000:
 		c.setEmulatorInfo("DXYN", "Disp", "Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.")
 		x := uint16(c.v[c.getXFromOpcode()])
