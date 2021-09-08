@@ -6,6 +6,14 @@ import (
 	"time"
 )
 
+type opcodeParts struct {
+	x   byte
+	y   byte
+	n   byte
+	nn  byte
+	nnn uint16
+}
+
 // TODO: should decode just return the opcode name
 //       and then have a method Execute that uses a map[string]func() to execute the opcode
 
@@ -13,113 +21,112 @@ import (
 //       are too big
 func (c *Chip8) decode() {
 	c.pc += 2
+	o := opcodeParts{x: xFromOpcode(c.opcode), y: yFromOpcode(c.opcode), nnn: nnnFromOpcode(c.opcode), nn: nnFromOpcode(c.opcode), n: nFromOpcode(c.opcode)}
 	switch c.opcode & 0xF000 {
 	case 0x0000:
-		c.decode0x0000()
+		c.decode0x0000(o)
 	case 0x1000:
 		c.setEmulatorInfo("1NNN", "Flow", "Jumps to address NNN.")
-		c.pc = c.getNNNFromOpcode()
+		c.pc = o.nnn
 	case 0x2000:
 		c.setEmulatorInfo("2NNN", "Flow", "Calls subroutine at NNN.")
 		c.stack[c.sp] = c.pc
 		c.sp++
-		c.pc = c.getNNNFromOpcode()
+		c.pc = o.nnn
 	case 0x3000:
 		c.setEmulatorInfo("3XNN", "Cond", "Skips the next instruction if VX equals NN. (Usually the next instruction is a jump to skip a code block);")
-		if c.v[c.getXFromOpcode()] == byte(c.getNNFromOpcode()) {
+		if c.v[o.x] == byte(o.nn) {
 			c.pc += 2
 		}
 	case 0x4000:
 		c.setEmulatorInfo("4XNN", "Cond", "Skips the next instruction if VX does not equal NN. (Usually the next instruction is a jump to skip a code block);")
-		if c.v[c.getXFromOpcode()] != c.getNNFromOpcode() {
+		if c.v[o.x] != o.nn {
 			c.pc += 2
 		}
 	case 0x5000:
 		c.setEmulatorInfo("5XY0", "Cond", "Skips the next instruction if VX equals VY. (Usually the next instruction is a jump to skip a code block);")
-		if c.v[c.getXFromOpcode()] == c.v[c.getYFromOpcode()] {
+		if c.v[o.x] == c.v[o.y] {
 			c.pc += 2
 		}
 	case 0x6000:
 		c.setEmulatorInfo("6XNN", "Const", "Sets VX to NN.")
-		index := c.getXFromOpcode()
-		c.v[index] = c.getNNFromOpcode()
-		c.vChanged[index] = true
+		c.v[o.x] = o.nn
+		c.vChanged[o.x] = true
 	case 0x7000:
 		c.setEmulatorInfo("7XNN", "Const", "Adds NN to VX. (Carry flag is not changed);")
-		index := c.getXFromOpcode()
-		c.v[index] += c.getNNFromOpcode()
-		c.vChanged[index] = true
+		c.v[o.x] += o.nn
+		c.vChanged[o.x] = true
 	case 0x8000:
-		c.decode0x8000()
+		c.decode0x8000(o)
 	case 0x9000:
 		c.setEmulatorInfo("9XY0", "Cond", "Skips the next instruction if VX does not equal VY. (Usually the next instruction is a jump to skip a code block);")
-		if c.v[c.getXFromOpcode()] != c.v[c.getYFromOpcode()] {
+		if c.v[o.x] != c.v[o.y] {
 			c.pc += 2
 		}
 	case 0xA000:
 		c.setEmulatorInfo("ANNN", "MEM", "Sets I to the address NNN.")
-		c.i = c.getNNNFromOpcode()
+		c.i = o.nnn
 	case 0xB000:
 		c.setEmulatorInfo("BNNN", "Flow", "Jumps to the address NNN plus V0.")
-		c.pc = c.getNNNFromOpcode() + uint16(c.v[0x0])
+		c.pc = o.nnn + uint16(c.v[0x0])
 	case 0xC000:
 		c.setEmulatorInfo("CXNN", "Rand", "Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.")
 		randSource := rand.NewSource(time.Now().UnixNano())
 		r := rand.New(randSource)
-		c.v[c.getXFromOpcode()] = byte(r.Intn(256)) & c.getNNFromOpcode()
-		c.vChanged[c.getXFromOpcode()] = true
+		c.v[o.x] = byte(r.Intn(256)) & o.nn
+		c.vChanged[o.x] = true
 	case 0xD000:
 		c.setEmulatorInfo("DXYN", "Disp", "Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.")
-		x := uint16(c.v[c.getXFromOpcode()])
-		y := uint16(c.v[c.getYFromOpcode()])
-		h := uint16(c.getNFromOpcode())
+		x := uint16(c.v[o.x])
+		y := uint16(c.v[o.y])
+		h := uint16(o.n)
 		c.draw(x, y, h)
 	case 0xE000:
-		c.decode0xE000()
+		c.decode0xE000(o)
 
 	case 0xF000:
-		c.decode0xF000()
+		c.decode0xF000(o)
 	default:
 		log.Printf("[ERROR]: Unknown opcode: ox%X\n", c.opcode)
 	}
 }
-func (c *Chip8) decode0xE000() {
+func (c *Chip8) decode0xE000(o opcodeParts) {
 	switch c.opcode & 0x0FF {
 	case 0x009E:
 		c.setEmulatorInfo("EX9E", "KeyOp", "Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block);")
-		if c.key[c.v[c.getXFromOpcode()]] == 1 {
+		if c.key[c.v[o.x]] == 1 {
 			c.pc += 2
 		}
 	case 0x00A1:
 		c.setEmulatorInfo("EXA1", "KeyOp", "Skips the next instruction if the key stored in VX is not pressed. (Usually the next instruction is a jump to skip a code block);")
-		if c.key[c.v[c.getXFromOpcode()]] != 1 {
+		if c.key[c.v[o.x]] != 1 {
 			c.pc += 2
 		}
 	}
 }
 
-func (c *Chip8) decode0xF000() {
+func (c *Chip8) decode0xF000(o opcodeParts) {
 	switch c.opcode & 0x00FF {
 	case 0x0007:
 		c.setEmulatorInfo("FX07", "Timer", "Sets VX to the value of the delay timer.")
-		c.v[c.getXFromOpcode()] = c.delayTimer
+		c.v[o.x] = c.delayTimer
 	case 0x000A:
 		// FX0A  KeyOp  A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event);
 		c.pc -= 2
 	case 0x0015:
 		c.setEmulatorInfo("FX15", "Timer", "Sets the delay timer to VX.")
-		c.delayTimer = c.v[c.getXFromOpcode()]
+		c.delayTimer = c.v[o.x]
 	case 0x0018:
 		c.setEmulatorInfo("FX18", "Sound", "Sets the sound timer to VX.")
-		c.soundTimer = c.v[c.getXFromOpcode()]
+		c.soundTimer = c.v[o.x]
 	case 0x001E:
 		c.setEmulatorInfo("FX1E", "MEM", "Adds VX to I. VF is not affected.")
-		c.i += uint16(c.v[c.getXFromOpcode()])
+		c.i += uint16(c.v[o.x])
 	case 0x0029: // TODO: Fx29 check implementation
 		c.setEmulatorInfo("FX29", "MEM", "Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.")
 		var loc uint16
 		for i := byte(0x0); i < 0x10; i++ {
-			if c.getXFromOpcode() == i {
+			if o.x == i {
 				c.i = loc
 			}
 			loc += 5
@@ -133,19 +140,19 @@ func (c *Chip8) decode0xF000() {
 			0X0 = I+1
 			00X = I+2
 		*/
-		c.memory[c.i] = c.v[c.getXFromOpcode()] / 100
-		c.memory[c.i+1] = (c.v[c.getXFromOpcode()] / 10) % 10
-		c.memory[c.i+2] = (c.v[c.getXFromOpcode()] % 100) % 10
+		c.memory[c.i] = c.v[o.x] / 100
+		c.memory[c.i+1] = (c.v[o.x] / 10) % 10
+		c.memory[c.i+2] = (c.v[o.x] % 100) % 10
 	case 0x0055: // TODO: FX55 should we increment I here?
 		c.setEmulatorInfo("FX55", "MEM", "Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
-		for i := byte(0x0); i <= c.getXFromOpcode(); i++ {
+		for i := byte(0x0); i <= o.x; i++ {
 			c.memory[c.i] = c.v[i]
 			c.i++
 		}
 		c.i++
 	case 0x0065: // TODO: FX65 should we increment I here?
 		c.setEmulatorInfo("FX65", "MEM", "Fills V0 to VX (including VX) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
-		for i := byte(0x0); i <= c.getXFromOpcode(); i++ {
+		for i := byte(0x0); i <= o.x; i++ {
 			c.v[i] = c.memory[c.i]
 			c.vChanged[i] = true
 			c.i++
@@ -154,79 +161,67 @@ func (c *Chip8) decode0xF000() {
 	}
 }
 
-func (c *Chip8) decode0x8000() {
+func (c *Chip8) decode0x8000(o opcodeParts) {
 	switch c.opcode & 0x000F {
 	case 0x0000:
 		c.setEmulatorInfo("8XY0", "Assig", "Sets VX to the value of VY.")
-		index := c.getXFromOpcode()
-		c.v[index] = c.v[c.getYFromOpcode()]
-		c.vChanged[index] = true
+		c.v[o.x] = c.v[o.y]
+		c.vChanged[o.x] = true
 	case 0x0001:
 		c.setEmulatorInfo("8XY1", "BitOp", "Sets VX to VX or VY. (Bitwise OR operation);")
-		index := c.getXFromOpcode()
-		c.v[index] |= c.v[c.getYFromOpcode()]
-		c.vChanged[index] = true
+		c.v[o.x] |= c.v[o.y]
+		c.vChanged[o.x] = true
 	case 0x0002:
 		c.setEmulatorInfo("8XY2", "BitOp", "Sets VX to VX and VY. (Bitwise AND operation);")
-		index := c.getXFromOpcode()
-		c.v[index] &= c.v[c.getYFromOpcode()]
-		c.vChanged[index] = true
+		c.v[o.x] &= c.v[o.y]
+		c.vChanged[o.x] = true
 	case 0x0003:
 		c.setEmulatorInfo("8XY3", "BitOp", "Sets VX to VX xor VY. (Bitwise XOR operation);")
-		index := c.getXFromOpcode()
-		c.v[index] ^= c.v[c.getYFromOpcode()]
-		c.vChanged[index] = true
+		c.v[o.x] ^= c.v[o.y]
+		c.vChanged[o.x] = true
 	case 0x0004:
 		c.setEmulatorInfo("8XY4", "Math", "Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there is not.")
-		indexX := c.getXFromOpcode()
-		indexY := c.getYFromOpcode()
-		if c.v[indexX] > (0xFF - c.v[indexY]) {
+		if c.v[o.x] > (0xFF - c.v[o.y]) {
 			c.v[0xF] = 1
 		} else {
 			c.v[0xF] = 0
 		}
 		c.vChanged[0xF] = true
-		c.v[indexX] += c.v[indexY]
-		c.vChanged[indexX] = true
+		c.v[o.x] += c.v[o.y]
+		c.vChanged[o.x] = true
 	case 0x0005: // TODO: double check 8XY5
 		c.setEmulatorInfo("8XY5", "Math", "VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there is not.")
-		indexX := c.getXFromOpcode()
-		indexY := c.getYFromOpcode()
-		c.subtract(indexX, indexX, indexY)
+		c.subtract(o.x, o.x, o.y)
 	case 0x0006:
 		c.setEmulatorInfo("8XY6", "BitOp", "Stores the least significant bit of VX in VF and then shifts VX to the right by 1.")
-		index := c.getXFromOpcode()
-		if c.v[index]&0x01 == 1 {
+		if c.v[o.x]&0x01 == 1 {
 			c.v[0xF] = 1
 		} else {
 			c.v[0xF] = 0
 		}
 		c.vChanged[0xF] = true
-		c.v[index] >>= 1
-		c.vChanged[index] = true
+		c.v[o.x] >>= 1
+		c.vChanged[o.x] = true
 	case 0x0007:
 		c.setEmulatorInfo("8XY7", "Math", "Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there is not.")
-		indexX := c.getXFromOpcode()
-		indexY := c.getYFromOpcode()
-		c.subtract(indexX, indexY, indexX)
+		c.subtract(o.x, o.y, o.x)
 	case 0x000E:
 		c.setEmulatorInfo("8XYE", "BitOp", "Stores the most significant bit of VX in VF and then shifts VX to the left by 1.")
-		index := c.getXFromOpcode()
-		if c.v[index]&0x8 == 1 {
+		if c.v[o.x]&0x8 == 1 {
 			c.v[0xF] = 1
 		} else {
 			c.v[0xF] = 0
 		}
 		c.vChanged[0xF] = true
-		c.v[index] <<= 1
-		c.vChanged[index] = true
+		c.v[o.x] <<= 1
+		c.vChanged[o.x] = true
 	default:
 		log.Printf("[ERROR]: Unknown opcode: ox%X\n", c.opcode)
 
 	}
 }
 
-func (c *Chip8) decode0x0000() {
+func (c *Chip8) decode0x0000(o opcodeParts) {
 	switch c.opcode & 0x00FF {
 	case 0x00E0:
 		c.setEmulatorInfo("00E0", "Display", "Clears the screen.")
@@ -278,22 +273,22 @@ func (c *Chip8) subtract(target, x, y byte) {
 	c.vChanged[target] = true
 }
 
-func (c Chip8) getXFromOpcode() byte {
-	return byte((c.opcode & 0x0F00) >> 8)
+func xFromOpcode(opcode uint16) byte {
+	return byte((opcode & 0x0F00) >> 8)
 }
 
-func (c Chip8) getYFromOpcode() byte {
-	return byte((c.opcode & 0x00F0) >> 4)
+func yFromOpcode(opcode uint16) byte {
+	return byte((opcode & 0x00F0) >> 4)
 }
 
-func (c Chip8) getNNNFromOpcode() uint16 {
-	return c.opcode & 0x0FFF
+func nnnFromOpcode(opcode uint16) uint16 {
+	return opcode & 0x0FFF
 }
 
-func (c Chip8) getNNFromOpcode() byte {
-	return byte(c.opcode & 0x00FF)
+func nnFromOpcode(opcode uint16) byte {
+	return byte(opcode & 0x00FF)
 }
 
-func (c Chip8) getNFromOpcode() byte {
-	return byte(c.opcode & 0x000F)
+func nFromOpcode(opcode uint16) byte {
+	return byte(opcode & 0x000F)
 }
