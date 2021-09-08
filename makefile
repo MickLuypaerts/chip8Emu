@@ -1,17 +1,17 @@
 build:
 	go build
 rIBM:
-	chip8 ".\roms\IBM Logo.ch8"
+	chip8Emu ".\roms\IBM Logo.ch8"
 
 rTest:
-	chip8 ".\roms\test_opcode.ch8"
+	chip8Emu ".\roms\test_opcode.ch8"
 
 rTetris:
-	chip8 ".\roms\Tetris [Fran Dachille, 1991].ch8"
+	chip8Emu ".\roms\Tetris [Fran Dachille, 1991].ch8"
 rPong:
-	chip8 ".\roms\Pong (1 player).ch8"
+	chip8Emu ".\roms\Pong (1 player).ch8"
 rSpaceInvaders:
-	chip8 ".\roms\SpaceInvaders.ch8"
+	chip8Emu ".\roms\SpaceInvaders.ch8"
 
 rTestKey:
-	chip8 ".\roms\KeypadTest.ch8"
+	chip8Emu ".\roms\KeypadTest.ch8"
