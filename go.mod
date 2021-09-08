@@ -1,4 +1,4 @@
-module chip8
+module github.com/MickLuypaerts/chip8Emu
 
 go 1.16
 

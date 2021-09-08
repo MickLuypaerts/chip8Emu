@@ -1,6 +1,6 @@
 package view
 
-import "chip8/emulator"
+import "github.com/MickLuypaerts/chip8Emu/emulator"
 
 func (t TUI) ControlsMap() map[string]emulator.Control {
 	m := make(map[string]emulator.Control)

@@ -1,8 +1,9 @@
 package chip8
 
 import (
-	"chip8/emulator"
 	"fmt"
+
+	"github.com/MickLuypaerts/chip8Emu/emulator"
 )
 
 func (c *Chip8) GetGPRValues() []string {

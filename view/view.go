@@ -1,11 +1,12 @@
 package view
 
 import (
-	"chip8/emulator"
 	"fmt"
 	"image"
 	"os"
 	"sync"
+
+	"github.com/MickLuypaerts/chip8Emu/emulator"
 
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"

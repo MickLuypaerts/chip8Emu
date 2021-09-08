@@ -1,11 +1,12 @@
 package main
 
 import (
-	"chip8/chip8"
-	"chip8/emulator"
-	"chip8/view"
 	"log"
 	"os"
+
+	"github.com/MickLuypaerts/chip8Emu/chip8"
+	"github.com/MickLuypaerts/chip8Emu/emulator"
+	"github.com/MickLuypaerts/chip8Emu/view"
 )
 
 func main() {

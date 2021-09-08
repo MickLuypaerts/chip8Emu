@@ -1,6 +1,6 @@
 package chip8
 
-import "chip8/emulator"
+import "github.com/MickLuypaerts/chip8Emu/emulator"
 
 func (c Chip8) ControlsMap() map[string]emulator.Control {
 	m := make(map[string]emulator.Control)

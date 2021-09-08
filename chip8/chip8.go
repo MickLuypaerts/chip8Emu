@@ -1,9 +1,10 @@
 package chip8
 
 import (
-	"chip8/emulator"
 	"io/ioutil"
 	"time"
+
+	"github.com/MickLuypaerts/chip8Emu/emulator"
 )
 
 const (
