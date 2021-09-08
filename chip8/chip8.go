@@ -27,20 +27,19 @@ var (
 )
 
 type Chip8 struct {
-	opcode       uint16
-	i            uint16 // The address register, which is named I, is 12 bits wide and is used with several opcodes that involve memory operations.
-	pc           uint16
-	stack        [stackSize]uint16
-	sp           byte
-	memory       [memorySize]byte
-	v            [vRegSize]byte // general purpose registers
-	vChanged     [vRegSize]bool
-	screenBuf    [screenWidth * screenHeigth]byte
-	drawFlag     bool
-	playingSound bool
-	key          [keyNumbers]byte
-	delayTimer   byte
-	soundTimer   byte
+	opcode     uint16
+	i          uint16 // The address register, which is named I, is 12 bits wide and is used with several opcodes that involve memory operations.
+	pc         uint16
+	stack      [stackSize]uint16
+	sp         byte
+	memory     [memorySize]byte
+	v          [vRegSize]byte // general purpose registers
+	vChanged   [vRegSize]bool
+	screenBuf  [screenWidth * screenHeigth]byte
+	drawFlag   bool
+	key        [keyNumbers]byte
+	delayTimer byte
+	soundTimer byte
 
 	info       emulator.EmulatorInfo
 	SetEmuInfo func(emulator.ChipGetter)
@@ -100,10 +99,7 @@ func (c *Chip8) updateTimers() {
 		c.delayTimer--
 	}
 	if c.soundTimer > 0 {
-		c.playingSound = true
 		c.soundTimer--
-	} else {
-		c.playingSound = false
 	}
 }
 
