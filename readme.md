@@ -66,13 +66,6 @@ Sound timer: This timer is used for sound effects. When its value is nonzero, a 
 [X] FX55  
 [X] FX65  
 
-
-1 Ticker for the clock cycles => every tick chip8.EmulateCycle()
-non blocking channel for keyboard input => select + default
-blocking channel for keyboard opcode: FX0A
-
-
-
 # packages
 https://github.com/gizak/termui/
 
