@@ -122,10 +122,10 @@ func (c *Chip8) decode0xF000(o opcodeParts) {
 	case 0x001E:
 		c.i += uint16(c.v[o.x])
 		c.setEmulatorInfo("FX1E", "MEM", "Adds VX to I. VF is not affected.")
-	case 0x0029: // TODO: Fx29 check implementation
+	case 0x0029:
 		var loc uint16
 		for i := byte(0x0); i < 0x10; i++ {
-			if o.x == i {
+			if c.v[o.x] == i {
 				c.i = loc
 			}
 			loc += 5
