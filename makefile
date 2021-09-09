@@ -15,3 +15,9 @@ rSpaceInvaders:
 
 rTestKey:
 	chip8Emu ".\roms\KeypadTest.ch8"
+
+rMaze:
+	chip8Emu ".\roms\Maze (alt) [David Winter, 199x].ch8"
+
+rRnumber:
+	chip8Emu ".\roms\Random Number Test [Matthew Mikolay, 2010].ch8"
