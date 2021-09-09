@@ -136,7 +136,12 @@ func (c *Chip8) runClockCycle(clockTimer *time.Ticker) {
 			c.emulateCycle()
 
 		case k := <-keyboardInterrupt:
-			keyboardResetTimer.Stop()
+			if !keyboardResetTimer.Stop() {
+				select {
+				case <-keyboardResetTimer.C:
+				default:
+				}
+			}
 			keyboardResetTimer.Reset(keyboardResetDuration)
 			c.pressKey(k)
 		case <-keyboardResetTimer.C:
