@@ -151,12 +151,15 @@ func (c *Chip8) decode0xF000(o opcodeParts) {
 		c.i++
 		c.setEmulatorInfo("FX55", "MEM", "Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
 	case 0x0065: // TODO: FX65 should we increment I here?
+		iCounter := c.i
 		for i := byte(0x0); i <= o.x; i++ {
-			c.v[i] = c.memory[c.i]
+			//c.v[i] = c.memory[c.i]
+			c.v[i] = c.memory[iCounter]
 			c.vChanged[i] = true
-			c.i++
+			//c.i++
+			iCounter++
 		}
-		c.i++
+		//c.i++
 		c.setEmulatorInfo("FX65", "MEM", "Fills V0 to VX (including VX) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.")
 	}
 }
